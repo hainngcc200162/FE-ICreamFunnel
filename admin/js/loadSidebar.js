@@ -1,12 +1,38 @@
-// Load sidebar.html vào #layout-menu
 fetch('../components/sidebar.html')
   .then(res => res.text())
   .then(data => {
     const menuContainer = document.getElementById('layout-menu');
     menuContainer.innerHTML = data;
 
+    highlightActiveMenu();
     initSidebarMenu();
   });
+
+function highlightActiveMenu() {
+  const currentPath = window.location.pathname;
+
+  const menuLinks = document.querySelectorAll(".menu-link");
+
+  menuLinks.forEach(link => {
+    const href = link.getAttribute("href");
+
+    if (!href || href.startsWith("javascript")) return;
+
+    if (currentPath.endsWith(href)) {
+      const menuItem = link.closest(".menu-item");
+      menuItem.classList.add("active");
+
+      const parentSubmenu = menuItem.closest(".menu-sub");
+      if (parentSubmenu) {
+        const parentItem = parentSubmenu.closest(".menu-item");
+        if (parentItem) {
+          parentItem.classList.add("active", "open");
+        }
+      }
+    }
+  });
+}
+
 
 function initSidebarMenu() {
   (function () {
@@ -114,7 +140,6 @@ function initSidebarMenu() {
       return;
     }
 
-    // If current layout is vertical and current window screen is > small
 
     // Auto update menu collapsed/expanded based on the themeConfig
     window.Helpers.setCollapsed(true, false);

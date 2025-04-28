@@ -8,30 +8,34 @@ fetch('../components/sidebar.html')
     initSidebarMenu();
   });
 
-function highlightActiveMenu() {
-  const currentPath = window.location.pathname;
-
-  const menuLinks = document.querySelectorAll(".menu-link");
-
-  menuLinks.forEach(link => {
-    const href = link.getAttribute("href");
-
-    if (!href || href.startsWith("javascript")) return;
-
-    if (currentPath.endsWith(href)) {
-      const menuItem = link.closest(".menu-item");
-      menuItem.classList.add("active");
-
-      const parentSubmenu = menuItem.closest(".menu-sub");
-      if (parentSubmenu) {
-        const parentItem = parentSubmenu.closest(".menu-item");
-        if (parentItem) {
-          parentItem.classList.add("active", "open");
+  function highlightActiveMenu() {
+    const currentPath = window.location.pathname;
+    const menuLinks = document.querySelectorAll(".menu-link");
+  
+    menuLinks.forEach(link => {
+      const href = link.getAttribute("href");
+  
+      if (!href || href.startsWith("javascript")) return;
+  
+      if (currentPath.includes(href.split('.')[0])) { 
+  
+        const menuItem = link.closest(".menu-item");
+        if (menuItem) {
+          menuItem.classList.add("active");
+        }
+  
+        const parentSubmenu = menuItem.closest(".menu-sub");
+        if (parentSubmenu) {
+          const parentItem = parentSubmenu.closest(".menu-item");
+          if (parentItem) {
+            parentItem.classList.add("active", "open");
+          }
         }
       }
-    }
-  });
-}
+    });
+  }
+  
+  
 
 
 function initSidebarMenu() {

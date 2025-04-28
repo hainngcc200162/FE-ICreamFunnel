@@ -22,10 +22,8 @@ async function displayProfileData() {
         const profileName = data.name || 'Tên không có sẵn';
         const profileRole = data.role || 'Vai trò chưa xác định';
 
-        // Cập nhật tiêu đề chào mừng
         document.querySelector('.card-title.text-primary').innerText = `Chào mừng ${profileName}! 🎉`;
 
-        // Cập nhật thông tin user ở sidebar/topbar
         const userInfoEl = document.getElementById('user-info');
         if (userInfoEl) {
             userInfoEl.innerHTML = `
@@ -36,14 +34,12 @@ async function displayProfileData() {
     }
 }
 
-
 function logoutUser() {
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
 
     window.location.href = '../../index.html';
 }
-
 
 window.onload = function() {
     displayProfileData();

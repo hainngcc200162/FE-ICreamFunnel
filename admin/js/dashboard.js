@@ -21,9 +21,6 @@ async function displayProfileData() {
     if (data) {
         const profileName = data.name || 'Tên không có sẵn';
         const profileRole = data.role || 'Vai trò chưa xác định';
-
-        document.querySelector('.card-title.text-primary').innerText = `Chào mừng ${profileName}! 🎉`;
-
         const userInfoEl = document.getElementById('user-info');
         if (userInfoEl) {
             userInfoEl.innerHTML = `
@@ -31,6 +28,12 @@ async function displayProfileData() {
                 <small class="text-muted">${profileRole}</small>
             `;
         }
+        const profileTitleEl = document.querySelector('.card-title.text-primary');
+        if (profileTitleEl) {
+            profileTitleEl.innerText = `Chào mừng ${profileName}! 🎉`;
+        }
+
+        
     }
 }
 

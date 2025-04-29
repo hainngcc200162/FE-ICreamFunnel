@@ -27,7 +27,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Quản lý quận - huyện</title>
+    <title>Quản lý Cửa Hàng</title>
 
     <meta name="description" content="" />
 
@@ -160,27 +160,42 @@
 
             <div class="container-xxl flex-grow-1 container-p-y">
                 <h4 class="fw-bold py-3 mb-4">
-                    <span class="text-muted fw-light">Quận - Huyện /</span> Quản lý Quận - Huyện.
+                    <span class="text-muted fw-light">Cửa hàng Kovamara /</span> Quản lý cửa hàng.
                 </h4>
                 <!-- <a href="" id="" class="btn btn-danger me-2" >THÊM MỚI</a> -->
-                <button id="addSubdistrictButton" class="btn btn-danger">THÊM MỚI</button>
+                <button id="addStoreBtn" class="btn btn-danger">THÊM MỚI</button>
                 <h1></h1>
                 <!-- Search Form -->
                 <form method="get" class="d-flex flex-wrap justify-content-start align-items-center">
                     <div class="row w-100">
                         <div class="col-md-4 mb-3">
                             <select class="form-select" id="province-select">
-                                <option value="">Chọn Tỉnh - Thành Phố</option>
+                                <option value="">Tất cả Tỉnh - Thành</option>
                             </select>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <input type="text" id="byName" name="byName" class="form-control" placeholder="Nhập tên Quận - Huyện" />
+                            <select class="form-select" id="subdistrict-select">
+                                <option value="">Tất cả Quận - Huyện</option>
+                            </select>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <button class="btn btn-danger w-100" type="submit">Tìm kiếm</button>
+                            <select id="isStoreAssigned" class="form-select">
+                                <option value="">-- Tất cả --</option>
+                                <option value="true">Đã phân công</option>
+                                <option value="false">Chưa phân công</option>
+                              </select>
                         </div>
                     </div>
-                </form>
+                    <div class="row w-100">
+                        <div class="col-md-8">
+                            <input type="text" id="byName" name="byName" class="form-control" placeholder="Nhập tên cửa hàng" />
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-danger w-100" type="submit">TÌM KIẾM</button>
+                        </div>
+                    </div>
+                    
+                </form>                
                 <hr class="my-3" />
 
                 <!-- Product Table -->
@@ -191,12 +206,15 @@
                             <thead>
                                 <tr>
                                     <th><strong>ID</strong></th>
-                                    <th><strong>Tên Quận - Huyện</strong></th>
+                                    <th><strong>Cửa Hàng</strong></th>
+                                    <th><strong>Địa chỉ</strong></th>
                                     <th><strong>Tỉnh - Thành Phố</strong></th>
+                                    <th><strong>Quận - Huyện</strong></th>
+                                    <th><strong>Được gán</strong></th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody class="table-border-bottom-0" id="subdistrict-results-body">
+                            <tbody class="table-border-bottom-0" id="store-results-body">
                                 <!-- Dữ liệu sẽ được thêm bằng JavaScript -->
                             </tbody>
                         </table>
@@ -270,106 +288,117 @@
     <script src="../assets/vendor/js/menu.js"></script>
     <!-- endbuild -->
 
-    <!-- Vendors JS -->
-
     <!-- Main JS -->
     <script src="../assets/js/main.js"></script>
-    <script src="https://buttons.github.io/buttons.js"></script>
     <script src="../js/dashboard.js"></script>
-
-
+    <script src="https://buttons.github.io/buttons.js"></script>
+    
 
     <!-- API JS -->
     <script src="../../env/config.develop.js"></script>
     <script src="../../TokenValid.js"></script>
     <script src="../js/loadSidebar.js"></script>
-    <script src="../js/manage-subdistrict.js"></script>
+    <script src="../js/manage-store.js"></script>
 
-    <!-- Modal thêm mới -->
-    <div class="modal fade" id="addSubdistrictModal" tabindex="-1" aria-labelledby="addSubdistrictModalLabel" aria-hidden="true">
+    <!-- Modal thêm mới cửa hàng -->
+    <div class="modal fade" id="addStoreModal" tabindex="-1" aria-labelledby="addStoreModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg"> 
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="addStoreModalLabel">Thêm mới cửa hàng</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+    
+            <div class="modal-body">
+                <div id="error-messages-store" class="alert alert-danger d-none" role="alert"></div>
+                <div id="success-message-store" class="alert alert-success d-none" role="alert"></div>
+    
+                <div class="mb-3">
+                    <label for="province-select-store" class="form-label">Tỉnh / Thành phố</label>
+                    <select id="province-select-store" class="form-select">
+                    <option value="">Chọn tỉnh/thành phố</option>
+                    </select>
+                </div>
+    
+                <div class="mb-3">
+                    <label for="subdistrict-select-store" class="form-label">Quận / Huyện</label>
+                    <select id="subdistrict-select-store" class="form-select">
+                    <option value="">Chọn quận/huyện</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="store-name-input" class="form-label">Tên cửa hàng</label>
+                    <input
+                    type="text"
+                    id="store-name-input"
+                    class="form-control"
+                    placeholder="Nhập tên cửa hàng"
+                    />
+                </div>
+    
+                <div class="mb-3">
+                    <label for="store-address-input" class="form-label">Địa chỉ</label>
+                    <input
+                    type="text"
+                    id="store-address-input"
+                    class="form-control"
+                    placeholder="Nhập địa chỉ cửa hàng"
+                    />
+                </div>
+            </div>
+    
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            <button type="button" class="btn btn-danger" id="addStoreButton">Thêm mới</button>
+            </div>
+        </div>
+        </div>
+    </div>
+  
+    <!-- Modal xóa quận/huyện -->
+    <div class="modal fade" id="delStoreModal" tabindex="-1" aria-labelledby="delStoreModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-l">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="addSubdistrictModalLabel">Thêm mới quận/huyện</h5>
+              <h5 class="modal-title" id="delStoreModalLabel">Xác nhận xóa cửa hàng</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
       
             <div class="modal-body">
-              <div id="error-messages" class="alert alert-danger d-none" role="alert"></div>
-              <div id="error-success" class="alert alert-success d-none" role="alert"></div>
+              <div id="del-error-messages" class="alert alert-danger d-none" role="alert"></div>
+              <div id="del-error-success" class="alert alert-success d-none" role="alert"></div>
+      
+              <p>Bạn chắc chắn muốn xóa cửa hàng này?</p>
       
               <div class="mb-3">
-                <label for="subdistrict-name-input" class="form-label">Tên quận/huyện</label>
-                <input
-                  type="text"
-                  id="subdistrict-name-input"
-                  class="form-control"
-                  placeholder="Nhập tên quận/huyện"
-                />
+                <label for="store-name-del" class="form-label">Tên cửa hàng</label>
+                <input type="text" id="store-name-del" class="form-control" readonly />
               </div>
       
               <div class="mb-3">
-                <label for="province-select-add" class="form-label">Chọn tỉnh/thành phố</label>
-                <select id="province-select-add" class="form-select">
-                  <option value="">Chọn tỉnh/thành phố</option>
-                </select>
+                <label for="store-address-del" class="form-label">Địa chỉ</label>
+                <input type="text" id="store-address-del" class="form-control" readonly />
+              </div>
+      
+              <div class="mb-3">
+                <label for="subdistrict-name-del" class="form-label">Quận/Huyện</label>
+                <input type="text" id="subdistrict-name-del" class="form-control" readonly />
+              </div>
+      
+              <div class="mb-3">
+                <label for="province-name-del" class="form-label">Tỉnh/Thành phố</label>
+                <input type="text" id="province-name-del" class="form-control" readonly />
               </div>
             </div>
       
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-              <button type="button" class="btn btn-danger" id="addSubdistrictBtn">Thêm mới</button>
+              <button type="button" class="btn btn-danger" id="deleteStoreBtn">Xóa</button>
             </div>
           </div>
         </div>
     </div>
       
-
-    <!-- Modal xóa quận/huyện -->
-    <div class="modal fade" id="delSubdistrictModal" tabindex="-1" aria-labelledby="delSubdistrictModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-l"> 
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="delSubdistrictModalLabel">Xác nhận xóa quận/huyện</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-                </div>
-        
-                <div class="modal-body">
-                    <div id="del-error-messages" class="alert alert-danger d-none" role="alert"></div>
-                    <div id="del-error-success" class="alert alert-success d-none" role="alert"></div>
-
-                    <p>Bạn chắc chắn muốn xóa quận/huyện này?</p>
-
-                    <div class="mb-3">
-                        <label for="subdistrict-name-del" class="form-label">Tên quận/huyện</label>
-                        <input
-                        type="text"
-                        id="subdistrict-name-del"
-                        class="form-control"
-                        placeholder="Tên quận/huyện"
-                        readonly
-                        />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="province-name-del" class="form-label">Tên tỉnh/thành phố</label>
-                        <input
-                            type="text"
-                            id="province-name-del"
-                            class="form-control"
-                            placeholder="Tên tỉnh/thành phố"
-                            readonly
-                        />
-                    </div>
-                </div>
-        
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-danger" id="deleteSubdistrictBtn">Xóa</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
   </body>
 </html>

@@ -6,7 +6,6 @@ async function getProfileData() {
 
         if (response.ok) {
             const data = await response.json();
-            console.log('Dữ liệu profile:', data);
             return data;
         } else {
             throw new Error('Không thể lấy dữ liệu profile');

@@ -27,7 +27,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Quản lý tỉnh - thành phố</title>
+    <title>Quản lý cửa hàng</title>
 
     <meta name="description" content="" />
 
@@ -160,7 +160,7 @@
 
             <div class="container-xxl flex-grow-1 container-p-y">
                 <h4 class="fw-bold mb-4">
-                    <span class="text-muted fw-light"></span> Quản lý Tỉnh/Thành.
+                    <span class="text-muted fw-light"></span> Quản lý Cửa Hàng Kovamara.
                 </h4>
                 <hr class="my-3" />
                 <!-- Basic Layout -->
@@ -168,7 +168,7 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                           <li class="breadcrumb-item">
-                            <a href="manage-province.html">Tỉnh - Thành Phố</a>
+                            <a href="manage-store.html">Cửa Hàng Kovamara</a>
                           </li>
                           <li class="breadcrumb-item active">Chi tiết</li>
                         </ol>
@@ -176,33 +176,63 @@
                     <div class="card mb-4">
                       <div class="card-header d-flex align-items-center justify-content-between">
                         <h5 class="mb-0">Bảng thông tin</h5>
-                        <small class="text-muted float-end">Thông tin tỉnh - thành phố</small>
+                        <small class="text-muted float-end">Thông Cửa Hàng Kovamara.</small>
                       </div>
                       <div class="card-body">
                         <form>
-                            <div  class="alert alert-danger d-none" role="alert"></div>
-                            <div id="error-success" class="alert alert-success alert-dismissible d-none" role="alert"></div>
-                            <div id="error-messages" class="alert alert-danger alert-dismissible d-none" role="alert"></div>
-                            <div  class="row mb-3">
-                                <label class="col-sm-2 col-form-label" for="provinceId">ID</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="provinceId" readonly />
-                                </div>
-                            </div>
+                          <div class="alert alert-danger d-none" role="alert"></div>
+                          <div id="error-success" class="alert alert-success alert-dismissible d-none" role="alert"></div>
+                          <div id="error-messages" class="alert alert-danger alert-dismissible d-none" role="alert"></div>
 
-                            <div class="row mb-3">
-                                <label class="col-sm-2 col-form-label" for="provinceName">Tên tỉnh/thành phố</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="provinceName"  />
-                                </div>
-                            </div>
-                        
-                            <div class="row mb-3">
-                                <button id="updateProvinceBtn" class="btn btn-danger btn-lg" type="button">Cập Nhật</button>
-                            </div>
-                            
-                        </form>
-                        
+                          <!-- ID cửa hàng -->
+                          <div class="row mb-3">
+                              <label class="col-sm-2 col-form-label" for="storeId">ID</label>
+                              <div class="col-sm-10">
+                                  <input type="text" class="form-control" id="storeId" readonly />
+                              </div>
+                          </div>
+                      
+                          <!-- Tên cửa hàng -->
+                          <div class="row mb-3">
+                              <label class="col-sm-2 col-form-label" for="storeName">Tên cửa hàng</label>
+                              <div class="col-sm-10">
+                                  <input type="text" class="form-control" id="storeName" placeholder="Nhập tên cửa hàng" />
+                              </div>
+                          </div>
+                      
+                          <!-- Địa chỉ -->
+                          <div class="row mb-3">
+                              <label class="col-sm-2 col-form-label" for="storeAddress">Địa chỉ</label>
+                              <div class="col-sm-10">
+                                  <input type="text" class="form-control" id="storeAddress" placeholder="Nhập địa chỉ cửa hàng" />
+                              </div>
+                          </div>
+                      
+                          <!-- Chọn tỉnh/thành phố -->
+                          <div class="row mb-3">
+                              <label class="col-sm-2 col-form-label" for="province-select-store-edit">Tỉnh/Thành phố</label>
+                              <div class="col-sm-10">
+                                  <select class="form-select" id="province-select-store-edit" disabled>
+                                      <option value="">Chọn tỉnh/thành phố</option>
+                                  </select>
+                              </div>
+                          </div>
+                      
+                          <!-- Chọn quận/huyện -->
+                          <div class="row mb-3">
+                              <label class="col-sm-2 col-form-label" for="subdistrict-select-store-edit">Quận/Huyện</label>
+                              <div class="col-sm-10">
+                                  <select class="form-select" id="subdistrict-select-store-edit" disabled>
+                                      <option value="">Chọn quận/huyện</option>
+                                  </select>
+                              </div>
+                          </div>
+                      
+                          <!-- Nút cập nhật -->
+                          <div class="row mb-12">
+                            <button id="updateStoreBtn" class="btn btn-danger btn-lg" type="button">Cập Nhật</button>
+                          </div>
+                      </form>
                       </div>
                     </div>
                   </div>
@@ -267,7 +297,7 @@
     <script src="../../env/config.develop.js"></script>
     <script src="../../TokenValid.js"></script>
     <script src="../js/loadSidebar.js"></script>
-    <script src="../js/manage-province-update.js"></script>
+    <script src="../js/manage-store-update.js"></script>
 
   </body>
 </html>

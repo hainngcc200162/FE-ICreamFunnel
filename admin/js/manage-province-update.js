@@ -1,6 +1,3 @@
-let currentPage = 1;
-let pageSize = 5;
-
 const successMessagesDiv = document.getElementById('scuccess-messages');
 const errorMessagesDiv = document.getElementById('error-messages');
 

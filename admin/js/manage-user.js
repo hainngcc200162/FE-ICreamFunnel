@@ -2,7 +2,6 @@ window.addEventListener('DOMContentLoaded', async function () {
     searchUsers();
 });
 
-
 let currentPageIndex = 1;
 let pageSizeIndex = 10;
 

@@ -54,7 +54,9 @@ document.getElementById('formAuthentication').addEventListener('submit', functio
       if (data.token && data.refreshToken) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('refreshToken', data.refreshToken);
-        window.location.href = '/admin/page/dashboard.html'; 
+        getProfileData().then(() => {
+          window.location.href = '/admin/page/dashboard.html';
+        });
       } else {
         errorMessagesDiv.innerText = 'Thông tin đăng nhập không đúng. Vui lòng kiểm tra lại.';
         errorMessagesDiv.classList.remove('d-none');
@@ -72,5 +74,28 @@ document.getElementById('formAuthentication').addEventListener('submit', functio
       errorEl.innerText = message;
       errorEl.classList.remove('d-none');
     }
+  }
+
+  async function getProfileData() {
+    const url = `${API_BASE_URL}Auth/Profile`;
+  
+    try {
+        const response = await apiRequest(url, { method: 'GET' });
+  
+        if (response.ok) {
+            const data = await response.json();
+            userRole = data.role; 
+            localStorage.setItem('userRole', userRole);
+
+            console.log(userRole);
+            
+            return data;
+        } else {
+            throw new Error('Không thể lấy dữ liệu profile');
+        }
+    } catch (error) {
+        console.error('Lỗi khi gọi API:', error);
+    }
+  
   }
 });

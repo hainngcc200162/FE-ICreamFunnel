@@ -27,7 +27,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Thiết lập tài khoản</title>
+    <title>Quản lý Kem - Kovamara</title>
 
     <meta name="description" content="" />
 
@@ -61,6 +61,8 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="../assets/js/config.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
   </head>
 
   <body>
@@ -70,14 +72,11 @@
         <!-- Menu -->
 
         <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-
+          
         </aside>
         <!-- / Menu -->
-
         <!-- Layout container -->
         <div class="layout-page">
-          <!-- Navbar -->
-          <!-- / Navbar -->
           <nav
             class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
             id="layout-navbar">
@@ -97,7 +96,6 @@
                 </div>
             </div>
             <!-- /Search -->
-
             <ul class="navbar-nav flex-row align-items-center ms-auto">
                 <!-- Place this tag where you want the button to render. -->
                 <li class="nav-item lh-1 me-3">
@@ -157,148 +155,90 @@
           <!-- Content wrapper -->
           <div class="content-wrapper">
             <!-- Content -->
+             
 
             <div class="container-xxl flex-grow-1 container-p-y">
-              <h4 class="fw-bold py-3 mb-4">
-                <span class="text-muted fw-light">Thiết lập tài khoản /</span> Thông báo
-              </h4>
+                <h4 class="fw-bold mb-4">
+                    <span class="text-muted fw-light"></span>Nhập Tồn Kho (Kem Kovamara)
+                </h4>
+                <hr class="my-3" />
+                <!-- Basic Layout -->
+                <div class="col-xxl">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                          <li class="breadcrumb-item">
+                            <a href="manage-icream.html">Kem Kovamara</a>
+                          </li>
+                          <li class="breadcrumb-item active">Nhập Kho</li>
+                        </ol>
+                      </nav>
+                    <div class="card mb-4">
+                      <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="mb-0">Bảng thông tin</h5>
+                        <small class="text-muted float-end">Thông tin nhập kho</small>
+                      </div>
+                      <div class="card-body">
+                        <form id="addStockForm">
+                          <div class="alert alert-danger d-none" role="alert"></div>
+                          <div id="error-success" class="alert alert-success alert-dismissible d-none" role="alert"></div>
+                          <div id="error-messages" class="alert alert-danger alert-dismissible d-none" role="alert"></div>
 
-              <div class="row">
-                <div class="col-md-12">
-                  <ul class="nav nav-pills flex-column flex-md-row mb-3">
-                    <li class="nav-item">
-                      <a class="nav-link" href="account-setting-account.html"
-                        ><i class="bx bx-user me-1"></i> Tài khoản</a
-                      >
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link active" href="javascript:void(0);"
-                        ><i class="bx bx-bell me-1"></i> Thông báo</a
-                      >
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="account-setting-connection.html"
-                        ><i class="bx bx-link-alt me-1"></i> Tích hợp</a
-                      >
-                    </li>
-                  </ul>
-                  <div class="card">
-                    <!-- Notifications -->
-                    <h5 class="card-header">Recent Devices</h5>
-                    <div class="card-body">
-                      <span
-                        >We need permission from your browser to show notifications.
-                        <span class="notificationRequest"><strong>Request Permission</strong></span></span
-                      >
-                      <div class="error"></div>
-                    </div>
-                    <div class="table-responsive">
-                      <table class="table table-striped table-borderless border-bottom">
-                        <thead>
-                          <tr>
-                            <th class="text-nowrap">Type</th>
-                            <th class="text-nowrap text-center">✉️ Email</th>
-                            <th class="text-nowrap text-center">🖥 Browser</th>
-                            <th class="text-nowrap text-center">👩🏻‍💻 App</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td class="text-nowrap">New for you</td>
-                            <td>
-                              <div class="form-check d-flex justify-content-center">
-                                <input class="form-check-input" type="checkbox" id="defaultCheck1" checked />
+                          <div class="row mb-3" hidden>
+                              <label class="col-sm-2 col-form-label" for="productId">Mã Sản Phẩm</label>
+                              <div class="col-sm-10">
+                                  <input type="text" class="form-control" id="productId" name="productId" readonly />
                               </div>
-                            </td>
-                            <td>
-                              <div class="form-check d-flex justify-content-center">
-                                <input class="form-check-input" type="checkbox" id="defaultCheck2" checked />
-                              </div>
-                            </td>
-                            <td>
-                              <div class="form-check d-flex justify-content-center">
-                                <input class="form-check-input" type="checkbox" id="defaultCheck3" checked />
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td class="text-nowrap">Account activity</td>
-                            <td>
-                              <div class="form-check d-flex justify-content-center">
-                                <input class="form-check-input" type="checkbox" id="defaultCheck4" checked />
-                              </div>
-                            </td>
-                            <td>
-                              <div class="form-check d-flex justify-content-center">
-                                <input class="form-check-input" type="checkbox" id="defaultCheck5" checked />
-                              </div>
-                            </td>
-                            <td>
-                              <div class="form-check d-flex justify-content-center">
-                                <input class="form-check-input" type="checkbox" id="defaultCheck6" checked />
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td class="text-nowrap">A new browser used to sign in</td>
-                            <td>
-                              <div class="form-check d-flex justify-content-center">
-                                <input class="form-check-input" type="checkbox" id="defaultCheck7" checked />
-                              </div>
-                            </td>
-                            <td>
-                              <div class="form-check d-flex justify-content-center">
-                                <input class="form-check-input" type="checkbox" id="defaultCheck8" checked />
-                              </div>
-                            </td>
-                            <td>
-                              <div class="form-check d-flex justify-content-center">
-                                <input class="form-check-input" type="checkbox" id="defaultCheck9" />
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td class="text-nowrap">A new device is linked</td>
-                            <td>
-                              <div class="form-check d-flex justify-content-center">
-                                <input class="form-check-input" type="checkbox" id="defaultCheck10" checked />
-                              </div>
-                            </td>
-                            <td>
-                              <div class="form-check d-flex justify-content-center">
-                                <input class="form-check-input" type="checkbox" id="defaultCheck11" />
-                              </div>
-                            </td>
-                            <td>
-                              <div class="form-check d-flex justify-content-center">
-                                <input class="form-check-input" type="checkbox" id="defaultCheck12" />
-                              </div>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                    <div class="card-body">
-                      <h6>When should we send you notifications?</h6>
-                      <form action="javascript:void(0);">
-                        <div class="row">
-                          <div class="col-sm-6">
-                            <select id="sendNotification" class="form-select" name="sendNotification">
-                              <option selected>Only when I'm online</option>
-                              <option>Anytime</option>
-                            </select>
                           </div>
-                          <div class="mt-4">
-                            <button type="submit" class="btn btn-danger me-2">Save changes</button>
-                            <button type="reset" class="btn btn-outline-secondary">Discard</button>
+                      
+                          <div class="row mb-3">
+                              <label class="col-sm-2 col-form-label" for="productName">Tên sản phẩm</label>
+                              <div class="col-sm-10">
+                                  <input type="text" class="form-control" id="productName" name="productName" readonly />
+                              </div>
                           </div>
-                        </div>
-                      </form>
+                      
+                          <div class="row mb-3" hidden>
+                              <label class="col-sm-2 col-form-label" for="storeId">Mã cửa hàng</label>
+                              <div class="col-sm-10">
+                                  <input type="text" class="form-control" id="storeId" name="storeId" readonly />
+                              </div>
+                          </div>
+                      
+                          <div class="row mb-3">
+                              <label class="col-sm-2 col-form-label" for="storeName">Tên CỬa hàng</label>
+                              <div class="col-sm-10">
+                                  <input type="text" class="form-control" id="storeName" name="storeName" readonly />
+                              </div>
+                          </div>
+
+                          <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label" for="stockQuantityCurrent">Tồn kho hiện tại</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="stockQuantityCurrent" name="stockQuantityCurrent" readonly />
+                            </div>
+                          </div>
+                      
+                          <div class="row mb-3">
+                              <label class="col-sm-2 col-form-label" for="stockQuantity">Số lượng (Hộp)</label>
+                              <div class="col-sm-10">
+                                  <input type="number" class="form-control" id="stockQuantity" name="stockQuantity" min="0" placeholder="Thêm số lượng nhập kho ở đây (VD: 100)" />
+                              </div>
+                          </div>
+                      
+                          <div class="row mb-3">
+                              <label class="col-sm-2 col-form-label" for="note">Ghi chú</label>
+                              <div class="col-sm-10">
+                                  <textarea class="form-control" id="note" name="note" rows="3" placeholder="Ghi chú thêm nếu cần... (Nhập hoặc chỉnh sửa)"></textarea>
+                              </div>
+                          </div>
+                      
+                          <div class="text-end">
+                              <button id="addStockBtn" class="btn btn-danger btn-lg" type="button">NHẬP TỒN KHO</button>
+                          </div>
+                      </form>                        
+                      </div>
                     </div>
-                    <!-- /Notifications -->
                   </div>
-                </div>
-              </div>
             </div>
             <!-- / Content -->
 
@@ -308,7 +248,7 @@
                 <div class="mb-2 mb-md-0">
                     ©
                     <script>
-                        document.write(new Date().getFullYear());
+                      document.write(new Date().getFullYear());
                     </script>
                     , made by
                     <a href="https://www.linkedin.com/in/nguyen-ngoc-hai-688707270/" target="_blank" class="footer-link fw-bolder">Nguyễn Ngọc Hải
@@ -338,7 +278,6 @@
       <!-- Overlay -->
       <div class="layout-overlay layout-menu-toggle"></div>
     </div>
-    <!-- / Layout wrapper -->
 
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
@@ -350,22 +289,18 @@
     <script src="../assets/vendor/js/menu.js"></script>
     <!-- endbuild -->
 
-    <!-- Vendors JS -->
+    <!-- Vendors JS --> 
 
     <!-- Main JS -->
     <script src="../assets/js/main.js"></script>
+    <script src="https://buttons.github.io/buttons.js"></script>
     <script src="../js/dashboard.js"></script>
-
-
-    <!-- Page JS -->
 
     <!-- API JS -->
     <script src="../../env/config.develop.js"></script>
     <script src="../../TokenValid.js"></script>
-    <script src="../js/account-setting-account.js"></script>
     <script src="../js/loadSidebar.js"></script>
-    
-    <!-- Place this tag in your head or just before your close body tag. -->
-    <script src="https://buttons.github.io/buttons.js"></script>
+    <script src="../js/manage-icream-addStock.js"></script>
+
   </body>
 </html>

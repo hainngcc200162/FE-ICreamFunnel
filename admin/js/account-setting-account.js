@@ -32,8 +32,17 @@ function populateProfileForm(data) {
 }
 
 window.onload = async function () {
+    displayProfileData();
+
     const profileData = await getProfileData();
     populateProfileForm(profileData);
+
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function (e) {
+            logoutUser();
+        });
+    }
 };
 
 function validatePhoneNumber(phoneNumber) {
@@ -200,4 +209,28 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
 });
+
+async function displayProfileData() {
+    const data = await getProfileData();
+    if (data) {
+        const profileName = data.name || 'Tên không có sẵn';
+        const profileRole = data.role || 'Vai trò chưa xác định';
+        const userInfoEl = document.getElementById('user-info');
+        if (userInfoEl) {
+            userInfoEl.innerHTML = `
+                <span class="fw-semibold d-block">${profileName}</span>
+                <small class="text-muted">${profileRole}</small>
+            `;
+        }
+        const profileTitleEl = document.querySelector('.card-title.text-primary');
+        if (profileTitleEl) {
+            profileTitleEl.innerText = `Chào mừng ${profileName}! 🎉`;
+        }        
+    }
+}
+
+function logoutUser() {
+    localStorage.clear();
+    window.location.href = '../../index.html';
+}
 

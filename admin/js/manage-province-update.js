@@ -1,6 +1,3 @@
-const successMessagesDiv = document.getElementById('scuccess-messages');
-const errorMessagesDiv = document.getElementById('error-messages');
-
 window.addEventListener('DOMContentLoaded', async function () {
     const provinceId = localStorage.getItem('provinceId');
     if (provinceId) {

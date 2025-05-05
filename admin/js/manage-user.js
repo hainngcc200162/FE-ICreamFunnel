@@ -60,7 +60,7 @@ function updateTable(users, pageNumber, totalPages) {
                 <td><strong>${user.name}</strong></td>
                 <td>${user.email}</td>
                 <td>${user.storeName || 'Chưa có cửa hàng'}</td>
-                <td>${user.role}</td>
+                <td>${user.phoneNumber}</td>
                 <td>${user.isActive ? 'Đã duyệt' : 'Chưa duyệt'}</td>
                 <td>
                     <a href="#" class="btn btn-icon text user-update-btn" data-user-id="${user.id}" title="Edit">

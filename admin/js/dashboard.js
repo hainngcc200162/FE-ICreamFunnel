@@ -31,16 +31,12 @@ async function displayProfileData() {
         const profileTitleEl = document.querySelector('.card-title.text-primary');
         if (profileTitleEl) {
             profileTitleEl.innerText = `Chào mừng ${profileName}! 🎉`;
-        }
-
-        
+        }        
     }
 }
 
 function logoutUser() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
-
+    localStorage.clear();
     window.location.href = '../../index.html';
 }
 

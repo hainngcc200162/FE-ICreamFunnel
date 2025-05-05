@@ -137,9 +137,7 @@ async function searchStores(pageNumber = 1, pageSize = 5) {
             row.dataset.name = store.name;
 
             row.innerHTML = `
-                <td>${store.id}</td>
                 <td><strong>${store.name}</strong></td>
-                <td>${store.address}</td>
                 <td>${store.subdistrictName}</td>
                 <td>${store.provinceName}</td>
                 <td><strong>${store.isStoreAssigned ? 'Đã phân công' : 'Chưa phân công'}</strong></td>

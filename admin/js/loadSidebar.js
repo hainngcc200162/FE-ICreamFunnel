@@ -1,3 +1,4 @@
+
 fetch('../components/sidebar.html')
   .then(res => res.text())
   .then(data => {
@@ -6,37 +7,35 @@ fetch('../components/sidebar.html')
 
     highlightActiveMenu();
     initSidebarMenu();
+    filterMenuByRole();
   });
 
-  function highlightActiveMenu() {
-    const currentPath = window.location.pathname;
-    const menuLinks = document.querySelectorAll(".menu-link");
-  
-    menuLinks.forEach(link => {
-      const href = link.getAttribute("href");
-  
-      if (!href || href.startsWith("javascript")) return;
-  
-      if (currentPath.includes(href.split('.')[0])) { 
-  
-        const menuItem = link.closest(".menu-item");
-        if (menuItem) {
-          menuItem.classList.add("active");
-        }
-  
-        const parentSubmenu = menuItem.closest(".menu-sub");
-        if (parentSubmenu) {
-          const parentItem = parentSubmenu.closest(".menu-item");
-          if (parentItem) {
-            parentItem.classList.add("active", "open");
-          }
+function highlightActiveMenu() {
+  const currentPath = window.location.pathname;
+  const menuLinks = document.querySelectorAll(".menu-link");
+
+  menuLinks.forEach(link => {
+    const href = link.getAttribute("href");
+
+    if (!href || href.startsWith("javascript")) return;
+
+    if (currentPath.includes(href.split('.')[0])) { 
+
+      const menuItem = link.closest(".menu-item");
+      if (menuItem) {
+        menuItem.classList.add("active");
+      }
+
+      const parentSubmenu = menuItem.closest(".menu-sub");
+      if (parentSubmenu) {
+        const parentItem = parentSubmenu.closest(".menu-item");
+        if (parentItem) {
+          parentItem.classList.add("active", "open");
         }
       }
-    });
-  }
-  
-  
-
+    }
+  });
+}
 
 function initSidebarMenu() {
   (function () {
@@ -149,3 +148,24 @@ function initSidebarMenu() {
     window.Helpers.setCollapsed(true, false);
   })();
 }
+
+function filterMenuByRole() {
+  const userRole = localStorage.getItem("userRole"); // Lấy vai trò từ localStorage
+
+  if (!userRole) {
+    console.warn("Không tìm thấy userRole trong localStorage");
+    return;
+  }
+
+  const menuItems = document.querySelectorAll(".menu-item");
+
+  menuItems.forEach(item => {
+    const requiredRole = item.getAttribute("data-role");
+
+    if (requiredRole && requiredRole !== userRole) {
+      item.style.display = "none";
+    }
+  });
+}
+
+

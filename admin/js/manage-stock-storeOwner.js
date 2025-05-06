@@ -1,18 +1,75 @@
 let currentPageIndex = 1;
-let pageSizeIndex = 5;
+let pageSizeIndex = 10;
 
 window.addEventListener('DOMContentLoaded', async function () {
     await getProfileData();
-    searchProducts();
+    await loadProducts();
+    searchStocks(currentPageIndex, pageSizeIndex);
 });
 
-async function searchProducts(pageNumber = 1, pageSize = 5) {
+document.querySelector("form").addEventListener("submit", function (event) {
+    event.preventDefault();
+    currentPage = 1;
+    searchStocks(currentPageIndex, pageSizeIndex);
+});
+
+async function loadProducts(pageNumber = 1, pageSize = 5) {
     if (!currentStoreId) {
         console.warn('Chưa có storeId, bỏ qua gọi API sản phẩm.');
         return;
     }
 
     const url = `${API_BASE_URL}Stock/Product?PageNumber=${pageNumber}&PageSize=${pageSize}&storeId=${currentStoreId}`;
+
+    try {
+        const response = await apiRequest(url, {
+            method: 'GET',
+            headers: { 'Accept': '*/*' }
+        });
+
+        const data = await response.json();
+        const products = data.items || [];
+
+        const productSelect = document.getElementById('product-select');
+        productSelect.innerHTML = '<option value="">Tất cả sản phẩm</option>';
+
+        products.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.id;
+            option.textContent = product.name;
+            productSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error fetching products:', error);
+    }
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    return `${day}/${month}/${year} <strong>${hours}:${minutes}</strong>`;
+}
+
+async function searchStocks(pageNumber = 1, pageSize = 10) {
+    if (!currentStoreId) {
+        console.warn('Chưa có storeId, bỏ qua gọi API sản phẩm.');
+        return;
+    }
+
+    const productId = document.getElementById('product-select').value;
+    const fromDate = document.getElementById('fromDate').value;
+    const toDate = document.getElementById('toDate').value;
+
+    let url = `${API_BASE_URL}Stock/history/store?storeId=${currentStoreId}&PageNumber=${pageNumber}&PageSize=${pageSize}`;
+    
+    if (productId) url += `&productId=${productId}`;
+    if (fromDate) url += `&fromDate=${fromDate}`;
+    if (toDate) url += `&toDate=${toDate}`;
 
     try {
         const response = await apiRequest(url, {
@@ -35,57 +92,27 @@ async function searchProducts(pageNumber = 1, pageSize = 5) {
     }
 }
 
-async function addStockProduct(productId, productName, stockQuantity) {
-    localStorage.setItem('productId', productId);
-    localStorage.setItem('productName', productName);
-    localStorage.setItem('stockQuantity', stockQuantity);
-
-    window.location.href = 'manage-icream-addStock.html';
-}
-
-async function updStockProduct(productId, productName, stockQuantity) {
-    localStorage.setItem('productId', productId);
-    localStorage.setItem('productName', productName);
-    localStorage.setItem('stockQuantity', stockQuantity);
-
-    window.location.href = 'manage-icream-updStock.html';
-}
-
-function updateTable(products, pageNumber, totalPages) {
+function updateTable(stocks, pageNumber, totalPages) {
     const tableBody = document.querySelector(".table-border-bottom-0");
     tableBody.innerHTML = '';
 
-    if (Array.isArray(products) && products.length > 0) {
-        products.forEach(product => {
-            const stockQuantity =
-                product.storeProducts && product.storeProducts.length > 0
-                    ? product.storeProducts[0].stockQuantity
-                    : 0;
-
+    if (Array.isArray(stocks) && stocks.length > 0) {
+        stocks.forEach(stock => {
             const row = document.createElement('tr');
 
             row.innerHTML = `
-                <td><strong>${product.name}</strong></td>
-                <td><img src="${product.imageUrl}" style="width: 50px; height: auto;" /></td>
-                <td>${product.price} VNĐ</td>
-                <td><strong>${stockQuantity}</strong></td>
-                <td>
-                    <a href="#" class="btn btn-icon product-addstock-btn" data-product-stockQuantity="${stockQuantity}" data-product-id="${product.id}" data-product-name="${product.name}" title="Nhập tồn">
-                        <i class='bx bx-message-square-add'></i>
-                    </a>
-                    <a href="#" class="btn btn-icon product-updstock-btn" data-product-stockQuantity="${stockQuantity}" data-product-id="${product.id}" data-product-name="${product.name}" title="Chỉnh sửa tồn">
-                        <i class='bx bx-message-square-edit'></i>
-                    </a>
-                </td>
+                <td>${stock.productName}</td>
+                <td>${stock.actionType}</td>
+                <td>${stock.changedQuantity}</td>
+                <td><strong>${stock.newQuantity}</strong></td>
+                <td>${formatDate(stock.createdAt)}</td>
+                <td>${stock.note}</td>
             `;
 
             tableBody.appendChild(row);
         });
 
-        attachAddStockEventListeners();
-        attachUpdStockEventListeners();
-
-        updatePaginationProduct(pageNumber, totalPages);
+        updatePaginationStock(pageNumber, totalPages);
     } else {
         const noDataRow = document.createElement('tr');
         noDataRow.innerHTML = `<td colspan="6" class="text-center">Không có dữ liệu</td>`;
@@ -93,9 +120,8 @@ function updateTable(products, pageNumber, totalPages) {
     }
 }
 
-
-function updatePaginationProduct(currentPage, totalPages) {
-    const paginationContainer = document.querySelector('#icream-pagination .pagination');
+function updatePaginationStock(currentPage, totalPages) {
+    const paginationContainer = document.querySelector('#stock-pagination .pagination');
 
     const firstPageButton = paginationContainer.querySelector('.first');
     const prevPageButton = paginationContainer.querySelector('.prev');
@@ -113,28 +139,28 @@ function updatePaginationProduct(currentPage, totalPages) {
     firstPageButton.querySelector('a').addEventListener('click', () => {
         if (currentPage > 1) {
             currentPage = 1;
-            searchProducts(currentPage, pageSizeIndex);
+            searchStocks(currentPage, pageSizeIndex);
         }
     });
 
     prevPageButton.querySelector('a').addEventListener('click', () => {
         if (currentPage > 1) {
             currentPage--;
-            searchProducts(currentPage, pageSizeIndex);
+            searchStocks(currentPage, pageSizeIndex);
         }
     });
 
     nextPageButton.querySelector('a').addEventListener('click', () => {
         if (currentPage < totalPages) {
             currentPage++;
-            searchProducts(currentPage, pageSizeIndex);
+            searchStocks(currentPage, pageSizeIndex);
         }
     });
 
     lastPageButton.querySelector('a').addEventListener('click', () => {
         if (currentPage < totalPages) {
             currentPage = totalPages;
-            searchProducts(currentPage, pageSizeIndex);
+            searchStocks(currentPage, pageSizeIndex);
         }
     });
 
@@ -148,40 +174,12 @@ function updatePaginationProduct(currentPage, totalPages) {
         pageLink.innerText = i;
         pageLink.addEventListener('click', () => {
             currentPage = i;
-            searchProducts(currentPage, pageSizeIndex);
+            searchStocks(currentPage, pageSizeIndex);
         });
 
         pageItem.appendChild(pageLink);
         paginationContainer.insertBefore(pageItem, nextPageButton);
     }
-}
-
-function attachAddStockEventListeners() {
-    const addButtons = document.querySelectorAll(".product-addstock-btn");
-    addButtons.forEach(button => {
-        button.addEventListener("click", async function (e) {
-            e.preventDefault();  
-            const productId = this.getAttribute('data-product-id');
-            const productName = this.getAttribute('data-product-name');
-            const stockQuantity = this.getAttribute('data-product-stockQuantity');
-
-            await addStockProduct(productId, productName, stockQuantity);
-        });
-    });
-}
-
-function attachUpdStockEventListeners() {
-    const updateButtons = document.querySelectorAll(".product-updstock-btn");
-    updateButtons.forEach(button => {
-        button.addEventListener("click", async function (e) {
-            e.preventDefault();  
-            const productId = this.getAttribute('data-product-id');
-            const productName = this.getAttribute('data-product-name');
-            const stockQuantity = this.getAttribute('data-product-stockQuantity');
-
-            await updStockProduct(productId, productName, stockQuantity);
-        });
-    });
 }
 
 async function getProfileData() {
@@ -216,10 +214,3 @@ async function getProfileData() {
         console.error('Lỗi khi gọi API:', error);
     }
 }
-
-
-
-
-
-
-

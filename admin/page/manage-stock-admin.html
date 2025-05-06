@@ -159,12 +159,110 @@
           <!-- Content wrapper -->
           <div class="content-wrapper">
             <!-- Content -->
-
             <div class="container-xxl flex-grow-1 container-p-y">
-                <h4 class="fw-bold py-3 mb-4">
-                    <span class="text-muted fw-light">Sản Phẩm/</span> Danh sách Kem Kovamara.
+                <h4 class="fw-bold py-3 mb-1">
+                    <span class="text-muted fw-light">Lịch Sử/</span>Quản lý Nhập Xuất Tồn Kho.
                 </h4>
+                <form method="get" class="d-flex flex-wrap justify-content-start align-items-center">
+                  <div class="row w-100">
+                      <div class="col-md-4 mb-1">
+                          <label for="province-select" class="form-label">Tỉnh - Thành Phố</label>
+                          <select class="form-select" id="province-select">
+                              <option value="">Tất cả Tỉnh - Thành</option>
+                          </select>
+                      </div>
+                      <div class="col-md-4 mb-1">
+                          <label for="subdistrict-select" class="form-label">Quận - Huyện</label>
+                          <select class="form-select" id="subdistrict-select">
+                              <option value="">Tất cả Quận - Huyện</option>
+                          </select>
+                      </div>
+                      <div class="col-md-4 mb-1">
+                        <label for="store-select" class="form-label">Cửa hàng</label>
+                        <select class="form-select" id="store-select">
+                            <option value="">Tất cả Cửa Hàng</option>
+                        </select>
+                    </div>
+                  </div>
+                  <div class="row w-100 ">
+                    <div class="col-md-4 mb-1">
+                        <label for="product-select" class="form-label">Sản phẩm</label>
+                        <select class="form-select" id="product-select">
+                            <option value="">Tất cả Sản Phẩm</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-1">
+                        <label for="fromDate" class="form-label">Từ ngày</label>
+                        <input type="date" class="form-control" id="fromDate" name="fromDate" placeholder="Từ ngày">
+                    </div>
+            
+                    <div class="col-md-4 mb-3">
+                        <label for="toDate" class="form-label">Đến ngày</label>
+                        <input type="date" class="form-control" id="toDate" name="toDate" placeholder="Đến ngày">
+                    </div>
+                    <div class="col-md-12">
+                        <button class="btn btn-danger w-100" type="submit">Tìm kiếm</button>
+                    </div>
+                  </div>
+                </form> 
+                <hr class="my-3" />
+
+                <!-- Product Table -->
+                <div class="card">
+                    <h5 class="card-header">Bảng thông tin</h5>
+                        <div class="table-responsive text-nowrap">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Cửa Hàng</th>
+                                        <th>Tên Sản Phẩm</th>
+                                        <th><strong>Thao tác</strong></th>
+                                        <th>Tồn nhập</th>
+                                        <th><strong>Tồn cuối</strong></th>
+                                        <th>Thời gian thực hiện</th>
+                                        <th>Ghi chú</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-border-bottom-0">
+                                    <tr>
+                                        <td> </td>
+                                        <td> </td>
+                                        <td> </td>
+                                        <td> </td>
+                                        <td> </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <Br></Br>
+                        <nav aria-label="Page navigation" id="stock-pagination">
+                            <ul class="pagination">
+                            <li class="page-item first">
+                                <a class="page-link" href="javascript:void(0);"
+                                ><i class="tf-icon bx bx-chevrons-left"></i
+                                ></a>
+                            </li>
+                            <li class="page-item prev">
+                                <a class="page-link" href="javascript:void(0);"
+                                ><i class="tf-icon bx bx-chevron-left"></i
+                                ></a>
+                            </li>
+                            
+                            <li class="page-item next">
+                                <a class="page-link" href="javascript:void(0);"
+                                ><i class="tf-icon bx bx-chevron-right"></i
+                                ></a>
+                            </li>
+                            <li class="page-item last">
+                                <a class="page-link" href="javascript:void(0);"
+                                ><i class="tf-icon bx bx-chevrons-right"></i
+                                ></a>
+                            </li>
+                            </ul>
+                        </nav>              
+                </div>
             </div>
+            
             <!-- / Content -->
 
             <!-- Footer -->
@@ -225,6 +323,6 @@
     <script src="../../env/config.develop.js"></script>
     <script src="../../TokenValid.js"></script>
     <script src="../js/loadSidebar.js"></script>
-    <script src="../js/manage-icream.js"></script>
+    <script src="../js/manage-stock-admin.js"></script>
   </body>
 </html>

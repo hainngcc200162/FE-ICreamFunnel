@@ -27,7 +27,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Quản lý Kem - Kovamara</title>
+    <title>Quản lý Tồn Kho</title>
 
     <meta name="description" content="" />
 
@@ -162,12 +162,33 @@
 
             <div class="container-xxl flex-grow-1 container-p-y">
                 <h4 class="fw-bold py-3 mb-4">
-                    <span class="text-muted fw-light">Sản Phẩm/</span> Danh sách Kem Kovamara.
+                    <span class="text-muted fw-light">Tồn Kho /</span> Hiện trạng tồn kho của các cửa hàng.
                 </h4>
+
+                <form method="get" class="d-flex flex-wrap justify-content-start align-items-center">
+                    <div class="row w-100">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label d-block">Tên cửa hàng quản lý</label>
+                            <div class="btn-group w-100" role="group" aria-label="Store Name">
+                                <button id="selected-store-name" type="button" class="btn btn-outline-secondary w-75" disabled>
+                                    Chọn cửa hàng được quản lý
+                                </button>
+                                <input type="hidden" id="selected-store-id" name="selectedStoreId">
+                                <button type="button" class="btn btn-outline-danger w-25">
+                                    <i class="bx bx-search fs-4 lh-0"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <button class="btn btn-danger w-100" type="submit">Tìm kiếm</button>
+                        </div>
+                    </div>
+                    
+                </form>
 
                 <!-- Product Table -->
                 <div class="card">
-                    <h5 id="storeName" class="card-header">Bảng thông tin</h5>
+                    <h5 class="card-header">Bảng thông tin</h5>
                         <div class="table-responsive text-nowrap">
                             <table class="table table-hover">
                                 <thead>
@@ -175,8 +196,7 @@
                                         <th>Tên Kem</th>
                                         <th>Hình Ảnh</th>
                                         <th>Giá tiền</th>
-                                        <th><strong>Tồn kho</strong></th>
-                                        <th>Nhập kho</th>
+                                        <th><strong>Tồn Cuối</strong></th>
                                     </tr>
                                 </thead>
                                 <tbody class="table-border-bottom-0">
@@ -185,14 +205,6 @@
                                         <td> </td>
                                         <td> </td>
                                         <td> </td>
-                                        <td>
-                                            <a href="#" class="btn btn-icon text" title="Add">
-                                                <i class='bx bx-message-square-add'></i>
-                                            </a>
-                                            <a href="#" class="btn btn-icon text" title="Edit">
-                                                <i class='bx bx-message-square-edit'></i> 
-                                            </a>                                           
-                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -286,6 +298,101 @@
     <script src="../../env/config.develop.js"></script>
     <script src="../../TokenValid.js"></script>
     <script src="../js/loadSidebar.js"></script>
-    <script src="../js/manage-icream.js"></script>
+
+    <!-- Modal tìm kiếm cửa hàng -->
+    <div class="modal fade" id="searchStoreModal" tabindex="-1" aria-labelledby="searchStoreModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl"> 
+        <div class="modal-content">
+    
+            <div class="modal-header">
+            <h5 class="modal-title" id="searchStoreModalLabel">Tìm kiếm cửa hàng</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+    
+            <div class="modal-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="province-select" class="form-label">Tỉnh / Thành phố</label>
+                    <select class="form-select" id="province-select">
+                        <option value="">-- Tất cả --</option>
+                    </select>
+                </div>
+    
+                <div class="col-md-6 mb-3">
+                <label for="subdistrict-select" class="form-label">Quận / Huyện</label>
+                <select class="form-select" id="subdistrict-select" >
+                    <option value="">-- Tất cả --</option>
+                </select>
+                </div>
+            </div>
+    
+            <div class="mb-3">
+                <label for="store-name-input" class="form-label">Tên cửa hàng</label>
+                <input
+                type="text"
+                id="store-name-input"
+                class="form-control"
+                placeholder="Nhập tên cửa hàng"
+                />
+            </div>
+    
+            <!-- Kết quả tìm kiếm -->
+            <div id="storeSearchResults" style="">
+                <h6 class="mb-3">Kết quả tìm kiếm:</h6>
+                <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên cửa hàng</th>
+                        <th>Địa chỉ</th>
+                        <th>Quận / Huyện</th>
+                        <th>Tỉnh / Thành phố</th>
+                    </tr>
+                    </thead>
+                    <tbody id="store-results-body" class="table-border-bottom-0">
+                    
+                    </tbody>
+                </table>
+                </div>
+            </div>
+            
+            </div>
+            <nav id="modal-pagination"  aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item first">
+                        <a class="page-link" href="javascript:void(0);">
+                            <i class="tf-icon bx bx-chevrons-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item prev">
+                        <a class="page-link" href="javascript:void(0);">
+                            <i class="tf-icon bx bx-chevron-left"></i>
+                        </a>
+                    </li>
+                    <!-- Các trang sẽ được tạo động qua JavaScript -->
+                    <li class="page-item next">
+                        <a class="page-link" href="javascript:void(0);">
+                            <i class="tf-icon bx bx-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item last">
+                        <a class="page-link" href="javascript:void(0);">
+                            <i class="tf-icon bx bx-chevrons-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+                      
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            <button type="button" class="btn btn-danger" id="searchStoreBtn">Tìm kiếm</button>
+            </div>
+        </div>
+        </div>
+    </div>
+    <script src="../js/modal-manage-user.js"></script>
+    <script src="../js/manage-icream-admin.js"></script>
+
   </body>
 </html>

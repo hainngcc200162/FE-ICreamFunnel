@@ -285,8 +285,8 @@ button.list-group-item-primary.active {
 
 .dropdown-item:not(.disabled).active,
 .dropdown-item:not(.disabled):active {
-  background-color: rgba(105, 108, 255, 0.08);
-  color: #696cff !important;
+  background-color: rgba(255, 105, 105, 0.08);
+  color: #ff2b2b !important;
 }
 
 .dropdown-menu > li:not(.disabled) > a:not(.dropdown-item):active,

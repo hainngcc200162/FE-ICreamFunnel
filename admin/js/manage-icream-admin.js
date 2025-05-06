@@ -1,18 +1,40 @@
 let currentPageIndex = 1;
 let pageSizeIndex = 5;
 
-window.addEventListener('DOMContentLoaded', async function () {
-    await getProfileData();
-    searchProducts();
+window.addEventListener('DOMContentLoaded', function () {
+    updateStoreId();
+    document.querySelector("form").addEventListener("submit", function (event) {
+        event.preventDefault();  
+        currentPageIndex = 1;  
+        updateStoreId();  
+    });
 });
 
-async function searchProducts(pageNumber = 1, pageSize = 5) {
-    if (!currentStoreId) {
-        console.warn('Chưa có storeId, bỏ qua gọi API sản phẩm.');
+function updateStoreId() {
+    const selectedStoreId = document.getElementById('selected-store-id').value;
+
+    if (!selectedStoreId) {
+        console.warn('Chưa chọn cửa hàng');
+        displayNoStoreIdMessage(); 
         return;
     }
 
-    const url = `${API_BASE_URL}Stock/Product?PageNumber=${pageNumber}&PageSize=${pageSize}&storeId=${currentStoreId}`;
+    searchProducts(currentPageIndex, pageSizeIndex);  
+}
+
+function displayNoStoreIdMessage() {
+    const tableBody = document.querySelector(".table-border-bottom-0");
+    tableBody.innerHTML = '';  
+
+    const noDataRow = document.createElement('tr');
+    noDataRow.innerHTML = `<td colspan="6" class="text-center">VUI LÒNG CHỌN CỬA HÀNG ĐỂ XEM TỒN KHO</td>`; 
+    tableBody.appendChild(noDataRow);  
+}
+
+async function searchProducts(pageNumber = 1, pageSize = 5) {
+    const selectedStoreId = document.getElementById('selected-store-id').value;
+
+    const url = `${API_BASE_URL}Stock/Product?PageNumber=${pageNumber}&PageSize=${pageSize}&storeId=${selectedStoreId}`;
 
     try {
         const response = await apiRequest(url, {
@@ -35,22 +57,6 @@ async function searchProducts(pageNumber = 1, pageSize = 5) {
     }
 }
 
-async function addStockProduct(productId, productName, stockQuantity) {
-    localStorage.setItem('productId', productId);
-    localStorage.setItem('productName', productName);
-    localStorage.setItem('stockQuantity', stockQuantity);
-
-    window.location.href = 'manage-icream-addStock.html';
-}
-
-async function updStockProduct(productId, productName, stockQuantity) {
-    localStorage.setItem('productId', productId);
-    localStorage.setItem('productName', productName);
-    localStorage.setItem('stockQuantity', stockQuantity);
-
-    window.location.href = 'manage-icream-updStock.html';
-}
-
 function updateTable(products, pageNumber, totalPages) {
     const tableBody = document.querySelector(".table-border-bottom-0");
     tableBody.innerHTML = '';
@@ -69,21 +75,10 @@ function updateTable(products, pageNumber, totalPages) {
                 <td><img src="${product.imageUrl}" style="width: 50px; height: auto;" /></td>
                 <td>${product.price} VNĐ</td>
                 <td><strong>${stockQuantity}</strong></td>
-                <td>
-                    <a href="#" class="btn btn-icon product-addstock-btn" data-product-stockQuantity="${stockQuantity}" data-product-id="${product.id}" data-product-name="${product.name}" title="Nhập tồn">
-                        <i class='bx bx-message-square-add'></i>
-                    </a>
-                    <a href="#" class="btn btn-icon product-updstock-btn" data-product-stockQuantity="${stockQuantity}" data-product-id="${product.id}" data-product-name="${product.name}" title="Chỉnh sửa tồn">
-                        <i class='bx bx-message-square-edit'></i>
-                    </a>
-                </td>
             `;
 
             tableBody.appendChild(row);
         });
-
-        attachAddStockEventListeners();
-        attachUpdStockEventListeners();
 
         updatePaginationProduct(pageNumber, totalPages);
     } else {
@@ -92,7 +87,6 @@ function updateTable(products, pageNumber, totalPages) {
         tableBody.appendChild(noDataRow);
     }
 }
-
 
 function updatePaginationProduct(currentPage, totalPages) {
     const paginationContainer = document.querySelector('#icream-pagination .pagination');
@@ -155,71 +149,3 @@ function updatePaginationProduct(currentPage, totalPages) {
         paginationContainer.insertBefore(pageItem, nextPageButton);
     }
 }
-
-function attachAddStockEventListeners() {
-    const addButtons = document.querySelectorAll(".product-addstock-btn");
-    addButtons.forEach(button => {
-        button.addEventListener("click", async function (e) {
-            e.preventDefault();  
-            const productId = this.getAttribute('data-product-id');
-            const productName = this.getAttribute('data-product-name');
-            const stockQuantity = this.getAttribute('data-product-stockQuantity');
-
-            await addStockProduct(productId, productName, stockQuantity);
-        });
-    });
-}
-
-function attachUpdStockEventListeners() {
-    const updateButtons = document.querySelectorAll(".product-updstock-btn");
-    updateButtons.forEach(button => {
-        button.addEventListener("click", async function (e) {
-            e.preventDefault();  
-            const productId = this.getAttribute('data-product-id');
-            const productName = this.getAttribute('data-product-name');
-            const stockQuantity = this.getAttribute('data-product-stockQuantity');
-
-            await updStockProduct(productId, productName, stockQuantity);
-        });
-    });
-}
-
-async function getProfileData() {
-    const url = `${API_BASE_URL}Auth/Profile`;
-    try {
-        const response = await apiRequest(url, { method: 'GET' });
-
-        if (response.ok) {
-            const data = await response.json();
-            currentStoreId = data.storeId;
-
-            const storeIdInput = document.getElementById('storeId');
-            if (storeIdInput) {
-                storeIdInput.value = data.storeId ?? '';
-            }
-
-            const storeNameInput = document.getElementById('storeName');
-            if (storeNameInput && storeNameInput.tagName === 'INPUT') {
-                storeNameInput.value = data.storeName ?? '';
-            }
-
-            const storeNameHeader = document.getElementById('storeName');
-            if (storeNameHeader && storeNameHeader.tagName === 'H5') {
-                storeNameHeader.textContent = data.storeName ?? 'Tên cửa hàng không xác định';
-            }
-
-            return data;
-        } else {
-            throw new Error('Không thể lấy dữ liệu profile');
-        }
-    } catch (error) {
-        console.error('Lỗi khi gọi API:', error);
-    }
-}
-
-
-
-
-
-
-

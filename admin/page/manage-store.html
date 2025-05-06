@@ -169,16 +169,19 @@
                 <form method="get" class="d-flex flex-wrap justify-content-start align-items-center">
                     <div class="row w-100">
                         <div class="col-md-4 mb-3">
+                            <label for="province-select" class="form-label">Tỉnh - Thành Phố</label>
                             <select class="form-select" id="province-select">
                                 <option value="">Tất cả Tỉnh - Thành</option>
                             </select>
                         </div>
                         <div class="col-md-4 mb-3">
+                            <label for="subdistrict-select" class="form-label">Quận - Huyện</label>
                             <select class="form-select" id="subdistrict-select">
                                 <option value="">Tất cả Quận - Huyện</option>
                             </select>
                         </div>
                         <div class="col-md-4 mb-3">
+                            <label for="isStoreAssigned" class="form-label">Trạng thái cửa hàng</label>
                             <select id="isStoreAssigned" class="form-select">
                                 <option value="">-- Tất cả --</option>
                                 <option value="true">Đã phân công</option>
@@ -186,18 +189,17 @@
                               </select>
                         </div>
                     </div>
-                    <div class="row w-100">
-                        <div class="col-md-8">
+                    <div class="row w-100 ">
+                        <label for="byName" class="form-label">Tên cửa hàng</label>
+                        <div class="col-md-8 mb-3">
                             <input type="text" id="byName" name="byName" class="form-control" placeholder="Nhập tên cửa hàng" />
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-4 mb-3">
                             <button class="btn btn-danger w-100" type="submit">TÌM KIẾM</button>
                         </div>
                     </div>
-                    
                 </form>                
                 <hr class="my-3" />
-
                 <!-- Product Table -->
                 <div class="card">
                     <h5 class="card-header">Bảng thông tin</h5>

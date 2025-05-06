@@ -22,7 +22,7 @@
     </li>
 
     <li class="menu-header small text-uppercase">
-        <span class="admin">Admin</span>
+        <span class="admin">Quản trị</span>
     </li>
     <li class="menu-item">
         <a href="manage-user.html" class="menu-link">
@@ -50,10 +50,11 @@
     </li>
 
     <li class="menu-header small text-uppercase">
-        <span class="menu-header-text">Store Owner</span>
+        <span class="menu-header-text">Cửa Hàng</span>
     </li>
 
-    <li class="menu-item" >
+    <!-- Store Owner -->
+    <li class="menu-item" data-role="StoreOwner">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class="menu-icon tf-icons bx bx-box"></i>
             <div data-i18n="">Hàng hóa - Tồn kho</div>
@@ -64,12 +65,27 @@
                     <div data-i18n="manage-icream">Kem - Kovamara</div>
                 </a>
             </li>
-            <li class="menu-item" data-role="StoreOwner">
+            <li class="menu-item" >
                 <a href="manage-stock-storeOwner.html" class="menu-link">
                     <div data-i18n="manage-stock">Lịch sử Nhập - Xuất</div>
                 </a>
             </li>
-            <li class="menu-item" data-role="Admin">
+        </ul>
+    </li>
+    
+    <!-- Admin -->
+    <li class="menu-item" data-role="Admin">
+        <a href="javascript:void(0);" class="menu-link menu-toggle">
+            <i class="menu-icon tf-icons bx bx-box"></i>
+            <div data-i18n="">Quản Lý tồn kho</div>
+        </a>
+        <ul class="menu-sub">
+            <li class="menu-item">
+                <a href="manage-icream-admin.html" class="menu-link">
+                    <div data-i18n="manage-icream">Tổng Tồn Kho</div>
+                </a>
+            </li>
+            <li class="menu-item" >
                 <a href="manage-stock-admin.html" class="menu-link">
                     <div data-i18n="manage-stock">Quản lý Nhập - Xuất</div>
                 </a>

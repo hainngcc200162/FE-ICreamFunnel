@@ -158,8 +158,18 @@ function filterMenuByRole() {
   }
 
   const menuItems = document.querySelectorAll(".menu-item");
+  const menuHeaders= document.querySelectorAll(".menu-header");
 
   menuItems.forEach(item => {
+    const requiredRole = item.getAttribute("data-role");
+
+    if (requiredRole && requiredRole !== userRole) {
+      item.style.display = "none";
+    }
+  });
+
+
+  menuHeaders.forEach(item => {
     const requiredRole = item.getAttribute("data-role");
 
     if (requiredRole && requiredRole !== userRole) {

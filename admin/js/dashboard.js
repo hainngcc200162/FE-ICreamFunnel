@@ -1,12 +1,12 @@
 
 async function getProfileData() {
-    const url = `${API_BASE_URL}Auth/Profile`;  
+    const url = `${API_BASE_URL}Auth/Profile`;
 
     try {
         const response = await apiRequest(url, { method: 'GET' });
 
         if (response.ok) {
-            const data = await response.json();  
+            const data = await response.json();
             return data;
         } else {
             throw new Error('Không thể lấy dữ liệu profile');
@@ -25,13 +25,15 @@ async function displayProfileData() {
         if (userInfoEl) {
             userInfoEl.innerHTML = `
                 <span class="fw-semibold d-block">${profileName}</span>
-                <small class="text-muted">${profileRole}</small>
+                <small class="text-muted">
+                ${profileRole === 'Admin' ? 'QUẢN TRỊ VIÊN' : profileRole === 'StoreOwner' ? 'CHỦ CỬA HÀNG' : ''}
+                </small>
             `;
         }
         const profileTitleEl = document.querySelector('.card-title.text-primary');
         if (profileTitleEl) {
             profileTitleEl.innerText = `Chào mừng ${profileName}! 🎉`;
-        }        
+        }
     }
 }
 
@@ -40,7 +42,7 @@ function logoutUser() {
     window.location.href = '../../index.html';
 }
 
-window.onload = function() {
+window.onload = function () {
     displayProfileData();
 
     const logoutBtn = document.getElementById('logout-btn');

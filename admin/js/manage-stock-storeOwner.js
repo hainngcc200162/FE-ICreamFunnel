@@ -13,6 +13,11 @@ document.querySelector("form").addEventListener("submit", function (event) {
     searchStocks(currentPageIndex, pageSizeIndex);
 });
 
+document.getElementById('exportReportBtn').addEventListener('click', function (event) {
+    event.preventDefault();
+    exportReport();
+});
+
 async function loadProducts(pageNumber = 1, pageSize = 5) {
     if (!currentStoreId) {
         console.warn('Chưa có storeId, bỏ qua gọi API sản phẩm.');
@@ -55,6 +60,79 @@ function formatDate(dateString) {
     return `${day}/${month}/${year} <strong>${hours}:${minutes}</strong>`;
 }
 
+async function exportReport() {
+    if (!currentStoreId) {
+        console.warn('Chưa có storeId, bỏ qua gọi API sản phẩm.');
+        return;
+    }
+
+    const productId = document.getElementById('product-select').value;
+    const fromDate = document.getElementById('fromDate').value;
+    const toDate = document.getElementById('toDate').value;
+
+    let url = `${API_BASE_URL}ExportReport/Stock_Report?storeId=${currentStoreId}`;
+
+    if (productId) url += `&productId=${productId}`;
+    if (fromDate) url += `&fromDate=${fromDate}`;
+    if (toDate) url += `&toDate=${toDate}`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Không thể xuất file báo cáo');
+        }
+
+        const blob = await response.blob();
+
+        const contentDisposition = response.headers.get('Content-Disposition');
+
+        let filename = 'BaoCaoXuatNhapTon_' + getFormattedDateTime(); 
+
+        if (contentDisposition) {
+            const filenameStar = contentDisposition.split('filename*=UTF-8\'\'')[1];
+            if (filenameStar) {
+                filename = decodeURIComponent(filenameStar);
+            } else {
+                const filenamePart = contentDisposition.split('filename=')[1];
+                if (filenamePart) {
+                    filename = filenamePart.replace(/"/g, '');
+                }
+            }
+        }
+
+        // Tạo URL và tự động tải file
+        const urlBlob = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = urlBlob;
+        link.download = filename; 
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(urlBlob);
+
+    } catch (error) {
+        console.error('Lỗi khi xuất báo cáo:', error);
+    }
+}
+
+function getFormattedDateTime() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0'); 
+    const day = now.getDate().toString().padStart(2, '0');
+    const hour = now.getHours().toString().padStart(2, '0');
+    const minute = now.getMinutes().toString().padStart(2, '0');
+    const second = now.getSeconds().toString().padStart(2, '0');
+
+    return `${year}${month}${day}_${hour}${minute}${second}`;
+}
+
 async function searchStocks(pageNumber = 1, pageSize = 10) {
     if (!currentStoreId) {
         console.warn('Chưa có storeId, bỏ qua gọi API sản phẩm.');
@@ -66,7 +144,7 @@ async function searchStocks(pageNumber = 1, pageSize = 10) {
     const toDate = document.getElementById('toDate').value;
 
     let url = `${API_BASE_URL}Stock/history/store?storeId=${currentStoreId}&PageNumber=${pageNumber}&PageSize=${pageSize}`;
-    
+
     if (productId) url += `&productId=${productId}`;
     if (fromDate) url += `&fromDate=${fromDate}`;
     if (toDate) url += `&toDate=${toDate}`;

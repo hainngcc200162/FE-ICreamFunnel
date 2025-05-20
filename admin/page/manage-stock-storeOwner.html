@@ -102,8 +102,8 @@
             <ul class="navbar-nav flex-row align-items-center ms-auto">
                 <!-- Place this tag where you want the button to render. -->
                 <li class="nav-item lh-1 me-3">
-                <a class="github-button" href="https://github.com/themeselection/sneat-html-admin-template-free"
-                    data-icon="octicon-star" data-size="large" data-show-count="true"
+                <a class="github-button" href="https://github.com/hainngcc200162"
+                    data-icon="octicon-star" data-size="large" data-show-count="false"
                     aria-label="Star themeselection/sneat-html-admin-template-free on GitHub">Star</a>
                 </li>
 
@@ -116,7 +116,7 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li>
-                    <a class="dropdown-item" href="#">
+                    <a class="dropdown-item" href="./account-setting-account.html">
                         <div class="d-flex">
                         <div class="flex-shrink-0 me-3">
                             <div class="avatar avatar-online">
@@ -183,10 +183,14 @@
                             <label for="toDate" class="form-label">Đến ngày</label>
                             <input type="date" class="form-control" id="toDate" name="toDate" placeholder="Đến ngày">
                         </div>
-                        <div class="col-md-12 mb-3">
-                            <button class="btn btn-danger w-100" type="submit">Tìm kiếm</button>
+                        <div class="col-md-11 mb-3">
+                            <button class="btn btn-danger w-100" type="submit">Tìm Kiếm</button>
                         </div>
-                
+                        <div class="col-md-1 mb-3">
+                            <button type="button" class="btn btn-icon btn-outline-secondary w-100" id="exportReportBtn">
+                              <span class="tf-icons bx bxs-file" style='color:#20d37c'></span>
+                            </button>
+                        </div>
                     </div>
                 </form>
                 <hr class="my-3" />
@@ -194,6 +198,7 @@
                 <!-- Product Table -->
                 <div class="card">
                     <h5 id="storeName" class="card-header">Bảng thông tin</h5>
+                    
                         <div class="table-responsive text-nowrap">
                             <table class="table table-hover">
                                 <thead>

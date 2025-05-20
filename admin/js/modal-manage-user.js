@@ -147,8 +147,6 @@ async function searchStores(pageNumber = 1, pageSize = 5) {
             row.addEventListener('click', function () {
                 const selectedId = this.dataset.id;
                 const selectedName = this.dataset.name;
-                console.log('ID cửa hàng được chọn:', selectedId);
-                console.log('Tên cửa hàng được chọn:', selectedName);
                 const storeNameBtn = document.getElementById('selected-store-name');
                 if (storeNameBtn) {
                     storeNameBtn.innerHTML = selectedName;

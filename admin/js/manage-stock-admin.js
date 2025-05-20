@@ -56,6 +56,11 @@ document.querySelector("form").addEventListener("submit", function (event) {
     searchStocks(currentPageIndex, pageSizeIndex);
 });
 
+document.getElementById('exportReportBtn').addEventListener('click', function (event) {
+    event.preventDefault();
+    exportReport();
+});
+
 async function loadProvinces() {
     const url = `${API_BASE_URL}Provinces?pageNumber=1&pageSize=10000`;
     try {
@@ -299,4 +304,83 @@ function updatePaginationStock(currentPage, totalPages) {
         pageItem.appendChild(pageLink);
         paginationContainer.insertBefore(pageItem, nextPageButton);
     }
+}
+
+async function exportReport() {
+    const provinceId = document.getElementById('province-select').value;
+    const subdistrictId = document.getElementById('subdistrict-select').value;
+    const storeId = document.getElementById('store-select').value;
+    const productId = document.getElementById('product-select').value;
+    const fromDate = document.getElementById('fromDate').value;
+    const toDate = document.getElementById('toDate').value;
+
+    let url = `${API_BASE_URL}ExportReport/Stock_Report`;
+
+    let params = [];
+
+    if (provinceId) params.push(`provinceId=${provinceId}`);
+    if (subdistrictId) params.push(`subdistrictId=${subdistrictId}`);
+    if (storeId) params.push(`storeId=${storeId}`);
+    if (productId) params.push(`productId=${productId}`);
+    if (fromDate) params.push(`fromDate=${fromDate}`);
+    if (toDate) params.push(`toDate=${toDate}`);
+
+    if (params.length > 0) {
+        url += `?${params.join('&')}`;
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Không thể xuất file báo cáo');
+        }
+
+        const blob = await response.blob();
+
+        const contentDisposition = response.headers.get('Content-Disposition');
+
+        let filename = 'BaoCaoXuatNhapTon_' + getFormattedDateTime();
+
+        if (contentDisposition) {
+            const filenameStar = contentDisposition.split('filename*=UTF-8\'\'')[1];
+            if (filenameStar) {
+                filename = decodeURIComponent(filenameStar);
+            } else {
+                const filenamePart = contentDisposition.split('filename=')[1];
+                if (filenamePart) {
+                    filename = filenamePart.replace(/"/g, '');
+                }
+            }
+        }
+
+        const urlBlob = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = urlBlob;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(urlBlob);
+
+    } catch (error) {
+        console.error('Lỗi khi xuất báo cáo:', error);
+    }
+}
+
+function getFormattedDateTime() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const hour = now.getHours().toString().padStart(2, '0');
+    const minute = now.getMinutes().toString().padStart(2, '0');
+    const second = now.getSeconds().toString().padStart(2, '0');
+
+    return `${year}${month}${day}_${hour}${minute}${second}`;
 }

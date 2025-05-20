@@ -27,10 +27,19 @@ function populateProfileForm(data) {
     document.getElementById('createdAt').value = data.createdAt
         ? new Date(data.createdAt).toISOString().slice(0, 16)
         : '';
-    document.getElementById('role').value = data.role || '';
+
+    const roleMapping = {
+        'Admin': 'QUẢN TRỊ VIÊN',
+        'StoreOwner': 'CHỦ CỬA HÀNG'
+    };
+
+    document.getElementById('role').value = roleMapping[data.role] || 'Không xác định';
+
     document.getElementById('isActive').value = data.isActive ? 'Hoạt động' : 'Ngừng hoạt động';
 }
 
+
+  
 window.onload = async function () {
     displayProfileData();
 
@@ -219,13 +228,15 @@ async function displayProfileData() {
         if (userInfoEl) {
             userInfoEl.innerHTML = `
                 <span class="fw-semibold d-block">${profileName}</span>
-                <small class="text-muted">${profileRole}</small>
+                <small class="text-muted">
+                    ${profileRole === 'Admin' ? 'QUẢN TRỊ VIÊN' : profileRole === 'StoreOwner' ? 'CHỦ CỬA HÀNG' : ''}
+                </small>            
             `;
         }
         const profileTitleEl = document.querySelector('.card-title.text-primary');
         if (profileTitleEl) {
             profileTitleEl.innerText = `Chào mừng ${profileName}! 🎉`;
-        }        
+        }
     }
 }
 

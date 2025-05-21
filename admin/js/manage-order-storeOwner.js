@@ -1,18 +1,19 @@
 let currentPageIndex = 1;
 let pageSizeIndex = 10;
+const successMessagesDiv = document.getElementById('error-success');
+const errorMessagesDiv = document.getElementById('error-messages');
+
 
 window.addEventListener('DOMContentLoaded', async function () {
     await getProfileData();
     searchOrders(currentPageIndex, pageSizeIndex);
-showTestModal();
-
+    showStatusMessageIfAny();
 });
 
 function showTestModal() {
     const myModal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
     myModal.show();
 }
-
 
 document.querySelector("form").addEventListener("submit", function (event) {
     event.preventDefault();
@@ -30,7 +31,6 @@ async function searchOrders(pageNumber = 1, pageSize = 10) {
     const orderCode = document.getElementById('orderCode').value.trim();
     const customerName = document.getElementById('customerName').value.trim();
     const customerPhone = document.getElementById('customerPhone').value.trim();
-    // const customerEmail = document.getElementById('customerEmail').value.trim();
     const status = document.getElementById('status').value;
     const isPaidStr = document.getElementById('isPaid').value;
     const fromDate = document.getElementById('fromDate').value;
@@ -41,7 +41,6 @@ async function searchOrders(pageNumber = 1, pageSize = 10) {
     if (orderCode) url += `&OrderCode=${encodeURIComponent(orderCode)}`;
     if (customerName) url += `&CustomerName=${encodeURIComponent(customerName)}`;
     if (customerPhone) url += `&CustomerPhone=${encodeURIComponent(customerPhone)}`;
-    // if (customerEmail) url += `&CustomerEmail=${encodeURIComponent(customerEmail)}`;
     if (status) url += `&Status=${encodeURIComponent(status)}`;
     if (isPaidStr === 'true') {
         url += `&IsPaid=true`;
@@ -86,7 +85,6 @@ const statusVNMap = {
     Cancelled: 'ĐÃ HỦY ĐƠN' + nbsp + nbsp
 };
 
-
 function updateTable(orders, pageNumber, totalPages) {
     const tableBody = document.querySelector(".table-border-bottom-0");
     tableBody.innerHTML = '';
@@ -100,7 +98,8 @@ function updateTable(orders, pageNumber, totalPages) {
 
             const row = document.createElement('tr');
 
-            row.dataset.id = order.orderCode;
+            row.dataset.orderCode = order.orderCode;
+            row.dataset.id = order.id;
 
             row.innerHTML = `
             <td>${order.orderCode}</td>
@@ -131,15 +130,8 @@ function updateTable(orders, pageNumber, totalPages) {
             <td>${order.note || ''}</td>
             `;
 
-            row.addEventListener('click', function () {
-                const selectedId = this.dataset.id;
-
-                const modalElement = document.getElementById('searchStoreModal');
-                const modal = bootstrap.Modal.getInstance(modalElement);
-            });
-
+            attachRowClickHandler(row);
             tableBody.appendChild(row);
-
             updateBtnGroupClass(order.status, btnGroupId);
         });
 
@@ -150,6 +142,206 @@ function updateTable(orders, pageNumber, totalPages) {
         tableBody.appendChild(noDataRow);
     }
 
+}
+
+function attachRowClickHandler(row) {
+    row.addEventListener('click', async function () {
+        const selectedOrderCode = this.dataset.orderCode;
+
+        try {
+            const apiUrl = `${API_BASE_URL}Order/order-code/${selectedOrderCode}`;
+            const response = await apiRequest(apiUrl, { method: 'GET' });
+
+            if (response.ok) {
+                const orderData = await response.json();
+                fillOrderModal(orderData);
+
+                const modalElement = document.getElementById('orderDetailModal');
+                if (modalElement) {
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+                    modal.show();
+                }
+            } else {
+                console.error('Không thể lấy chi tiết đơn hàng');
+            }
+        } catch (err) {
+            console.error('Lỗi khi gọi API đơn hàng:', err);
+        }
+    });
+
+    const btnGroups = row.querySelectorAll('.btn-group, .dropdown-menu, .dropdown-item, .btn');
+    btnGroups.forEach(el => {
+        el.addEventListener('click', async function (e) {
+            e.stopPropagation();
+
+            if (el.classList.contains('dropdown-item')) {
+                const newStatus = el.dataset.status;
+                const orderCode = row.dataset.orderCode;
+
+                try {
+                    const success = await updateOrderStatus(orderCode, newStatus);
+
+                    if (success) {
+                        showSuccessMessage(successMessagesDiv, `Cập nhật trạng thái đơn ${orderCode} thành công!`);
+
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 500);
+
+                    } else {
+                        showErrorMessage(errorMessagesDiv, 'Cập nhật trạng thái thất bại, vui lòng thử lại.');
+                        window.scrollTo(0, 0);
+                    }
+                } catch (err) {
+                    showErrorMessage(errorMessagesDiv, 'Lỗi khi cập nhật trạng thái: ' + err.message);
+                }
+            }
+        });
+    });
+}
+
+function setStatusMessage(type, message) {
+    localStorage.setItem('order-status-message', JSON.stringify({ type, message }));
+}
+
+function showStatusMessageIfAny() {
+    const messageData = JSON.parse(localStorage.getItem('order-status-message'));
+    if (!messageData) return;
+
+    const successBox = document.getElementById('error-success');
+    const errorBox = document.getElementById('error-messages');
+
+    if (messageData.type === 'success') {
+        showSuccessMessage(successBox, messageData.message);
+    } else {
+        showErrorMessage(errorBox, messageData.message);
+    }
+
+    localStorage.removeItem('order-status-message');
+}
+
+
+function showErrorMessage(errorDiv, message) {
+    errorDiv.innerHTML = '';
+    errorDiv.textContent = message;
+
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.classList.add('btn-close');
+    closeButton.setAttribute('aria-label', 'Close');
+    closeButton.addEventListener('click', function () {
+        errorDiv.classList.add('d-none');
+    });
+
+    errorDiv.appendChild(closeButton);
+    errorDiv.classList.remove('d-none');
+}
+
+function showSuccessMessage(successDiv, message) {
+    successDiv.innerHTML = '';
+    successDiv.textContent = message;
+
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.classList.add('btn-close');
+    closeButton.setAttribute('aria-label', 'Close');
+    closeButton.addEventListener('click', function () {
+        successDiv.classList.add('d-none');
+    });
+
+    successDiv.appendChild(closeButton);
+    successDiv.classList.remove('d-none');
+}
+
+
+const orderStatusEnum = {
+    Confirmed: 0,
+    Completed: 1,
+    Cancelled: 2
+};
+
+async function updateOrderStatus(orderCode, newStatusString) {
+    const newStatus = orderStatusEnum[newStatusString];
+
+    errorMessagesDiv.classList.add('d-none');
+    successMessagesDiv.classList.add('d-none');
+    errorMessagesDiv.textContent = '';
+    successMessagesDiv.textContent = '';
+
+    if (newStatus === undefined) {
+        console.error('Trạng thái không hợp lệ:', newStatusString);
+        return false;
+    }
+
+    const url = `${API_BASE_URL}Order/update-status/${orderCode}`;
+
+    try {
+        const response = await apiRequest(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newStatus)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Lỗi HTTP: ${response.status}`);
+        }
+        return true;
+    } catch (error) {
+        console.error('Lỗi khi gọi API cập nhật trạng thái:', error);
+        return false;
+    }
+}
+
+function fillOrderModal(data) {
+    document.getElementById('orderCodeModal').textContent = data.orderCode || '—';
+    document.getElementById('verificationCodeModal').textContent = data.verificationCode || '—';
+    document.getElementById('orderDateModal').textContent = new Date(data.orderDate).toLocaleString('vi-VN') || '—';
+    document.getElementById('statusModal').textContent = data.status || '—';
+    document.getElementById('customerNameModal').textContent = data.customerName || '—';
+    document.getElementById('customerPhoneModal').textContent = data.customerPhone || '—';
+    document.getElementById('customerEmailModal').textContent = data.customerEmail || '—';
+    document.getElementById('noteModal').textContent = data.note || '—';
+    document.getElementById('isPaidModal').textContent = data.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán';
+    document.getElementById('totalAmountModal').textContent = formatCurrency(data.totalAmount);
+
+    const statusEl = document.getElementById('statusModal');
+    const status = data.status || '—';
+
+    statusEl.textContent = statusVNMap[status] || status;
+
+    statusEl.className = '';
+
+    if (status === 'Completed') {
+        statusEl.classList.add('text-success', 'fw-bold');
+    } else if (status === 'Cancelled') {
+        statusEl.classList.add('text-danger', 'fw-bold');
+    } else if (status === 'Confirmed') {
+        statusEl.classList.add('fw-bold');
+    } else {
+        statusEl.classList.add('text-muted');
+    }
+
+
+    const tbody = document.getElementById("orderDetailsBodyModal");
+    tbody.innerHTML = '';
+
+    data.orderDetails.forEach(item => {
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+                    <td>${item.productName}</td>
+                    <td class="text-center">${item.quantity}</td>
+                    <td class="text-center">${formatCurrency(item.price)}</td>
+                    <td class="text-center">${formatCurrency(item.price * item.quantity)}</td>
+            `;
+
+        tbody.appendChild(row);
+    });
+
+    const totalCell = document.getElementById("totalAmountCellModal");
+    totalCell.textContent = formatCurrency(data.totalAmount);
 }
 
 function formatDate(dateString) {

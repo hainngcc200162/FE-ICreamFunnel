@@ -42,7 +42,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
         integrity="sha512-" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        
+
     </style>
 </head>
 
@@ -145,7 +145,7 @@
 
                     <div class="container-xxl flex-grow-1 container-p-y">
                         <h4 class="fw-bold py-3 mb-4">
-                            <span class="text-muted fw-light">Đơn hàng/</span> Quản lý đơn hàng.
+                            <span class="text-muted fw-light">Đơn hàng/</span> Điều phối đơn hàng.
                         </h4>
 
                         <!-- Search Form -->
@@ -175,13 +175,6 @@
                                             placeholder="Nhập số điện thoại khách hàng">
                                     </div>
                                 </div>
-
-                                <!-- <div class="col-md-3 mb-3">
-                                    <div class="form-group">
-                                        <label for="customerEmail" class="form-label">Email</label>
-                                        <input type="text" class="form-control" id="customerEmail" name="CustomerEmail" placeholder="Nhập số Email khách hàng">
-                                    </div>
-                                </div> -->
 
                                 <div class="col-md-3 mb-3">
                                     <div class="form-group">
@@ -227,15 +220,18 @@
                                     <button class="btn btn-danger w-100" type="submit">Tìm Kiếm</button>
                                 </div>
                             </div>
-                            <button class="btn btn-primary" onclick="showTestModal()">Hiển thị modal</button>
-
                         </form>
                         <hr class="my-3" />
 
                         <!-- Product Table -->
                         <div class="card">
-                            <h5 id="storeName" class="card-header">Bảng thông tin</h5>
-
+                            <div class="justify-content-between px-3 pt-3">
+                                <div id="error-success" class="alert alert-success alert-dismissible d-none"
+                                    role="alert"></div>
+                                <div id="error-messages" class="alert alert-danger alert-dismissible d-none"
+                                    role="alert"></div>
+                            </div>
+                            <h5 id="storeName" class="card-header pt-0">Bảng thông tin</h5>
                             <div class="table-responsive text-nowrap">
                                 <table class="table table-hover">
                                     <thead>
@@ -363,7 +359,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                 </div>
                 <div class="modal-body">
-
                     <div id="order-info-section" class="">
                         <div class="row">
                             <div class="col-md-4">
@@ -416,106 +411,6 @@
             </div>
         </div>
     </div>
-
-    <script>
-        // Hàm format tiền VNĐ chuẩn
-        function formatCurrencyVND(amount) {
-            return amount.toLocaleString('vi-VN') + ' VNĐ';
-        }
-
-        // Hàm đổ dữ liệu vào modal
-        function fillOrderModal(data) {
-            document.getElementById('orderCodeModal').textContent = data.orderCode || '—';
-            document.getElementById('verificationCodeModal').textContent = data.verificationCode || '—';
-            document.getElementById('orderDateModal').textContent = new Date(data.orderDate).toLocaleString('vi-VN') || '—';
-            document.getElementById('statusModal').textContent = data.status || '—';
-            document.getElementById('customerNameModal').textContent = data.customerName || '—';
-            document.getElementById('customerPhoneModal').textContent = data.customerPhone || '—';
-            document.getElementById('customerEmailModal').textContent = data.customerEmail || '—';
-            document.getElementById('noteModal').textContent = data.note || '—';
-            document.getElementById('isPaidModal').textContent = data.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán';
-            document.getElementById('totalAmountModal').textContent = formatCurrency(data.totalAmount);
-
-            // Xử lý danh sách sản phẩm
-            const tbody = document.getElementById("orderDetailsBodyModal");
-            tbody.innerHTML = ''; // reset
-
-            data.orderDetails.forEach(item => {
-                const row = document.createElement('tr');
-
-                row.innerHTML = `
-                    <td>${item.productName}</td>
-                    <td class="text-center">${item.quantity}</td>
-                    <td class="text-center">${formatCurrencyVND(item.price)}</td>
-                    <td class="text-center">${formatCurrencyVND(item.price * item.quantity)}</td>
-                `;
-
-                tbody.appendChild(row);
-            });
-
-            // Tổng tiền dưới bảng
-            const totalCell = document.getElementById("totalAmountCellModal");
-            totalCell.textContent = formatCurrencyVND(orderData.totalAmount);
-        }
-
-        // Dữ liệu mẫu test
-        const sampleOrderData = {
-            "id": 55,
-            "orderCode": "ORD55-20250520",
-            "verificationCode": "706815",
-            "orderDate": "2025-05-20T09:26:32.8966667",
-            "storeId": 42,
-            "customerName": "Nguyễn Ngọc Yến",
-            "customerPhone": "0912345678",
-            "customerEmail": "vana@example.com",
-            "note": "Khách cùi",
-            "status": "Confirmed",
-            "totalAmount": 183000,
-            "isPaid": false,
-            "paidAt": null,
-            "orderDetails": [
-                {
-                    "orderDetailId": 56,
-                    "orderId": 55,
-                    "storeProductID": 6,
-                    "productId": 1,
-                    "productName": "Kem Vani Truyền Thống",
-                    "imageUrl": "../assets/img/icreams/Kem-vani-2_900x900.png",
-                    "quantity": 2,
-                    "price": 25000
-                },
-                {
-                    "orderDetailId": 57,
-                    "orderId": 55,
-                    "storeProductID": 7,
-                    "productId": 2,
-                    "productName": "Kem Sô Cô La Đậm Đà",
-                    "imageUrl": "../assets/img/icreams/kem-chocolate-2_900x900.png",
-                    "quantity": 1,
-                    "price": 27000
-                },
-                {
-                    "orderDetailId": 58,
-                    "orderId": 55,
-                    "storeProductID": 8,
-                    "productId": 3,
-                    "productName": "Kem Dâu Tươi Mát",
-                    "imageUrl": "../assets/img/icreams/kem-dâu-2_900x900.png",
-                    "quantity": 3,
-                    "price": 30000
-                }
-            ]
-        };
-
-        // Khi mở modal, gọi hàm đổ dữ liệu (bạn chỉnh trigger show modal tùy theo project)
-        document.getElementById('orderDetailModal').addEventListener('show.bs.modal', function (event) {
-            fillOrderModal(sampleOrderData);
-        });
-    </script>
-
-
-
-
 </body>
 
 </html>

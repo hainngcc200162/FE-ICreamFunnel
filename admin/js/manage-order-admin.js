@@ -1,14 +1,42 @@
 let currentPageIndex = 1;
 let pageSizeIndex = 10;
-const successMessagesDiv = document.getElementById('error-success');
-const errorMessagesDiv = document.getElementById('error-messages');
-
 
 window.addEventListener('DOMContentLoaded', async function () {
     await getProfileData();
+    loadProvinces();
+
+    const provinceSelect = document.getElementById('province-select');
+    const subdistrictSelect = document.getElementById('subdistrict-select');
+    const storeSelect = this.document.getElementById('store-select');
+
+    subdistrictSelect.disabled = true;
+    storeSelect.disabled = true;
+
+    provinceSelect.addEventListener('change', function () {
+        const provinceId = provinceSelect.value;
+        if (provinceId) {
+            subdistrictSelect.disabled = false;
+            loadSubdistricts(provinceId);
+        } else {
+            subdistrictSelect.disabled = true;
+            subdistrictSelect.innerHTML = '<option value="">Tất cả Quận - Huyện</option>';
+        }
+    });
+
+    subdistrictSelect.addEventListener('change', function () {
+        const subdistrictId = subdistrictSelect.value;
+        if (subdistrictId) {
+            storeSelect.disabled = false;
+            loadStores(subdistrictId);
+        } else {
+            storeSelect.disabled = true;
+            storeSelect.innerHTML = '<option value="">Tất cả Cửa Hàng</option>';
+        }
+    });
+
     searchOrders(currentPageIndex, pageSizeIndex);
-    showStatusMessageIfAny();
 });
+
 
 document.querySelector("form").addEventListener("submit", function (event) {
     event.preventDefault();
@@ -16,13 +44,89 @@ document.querySelector("form").addEventListener("submit", function (event) {
     searchOrders(currentPageIndex, pageSizeIndex);
 });
 
+async function loadProvinces() {
+    const url = `${API_BASE_URL}Provinces?pageNumber=1&pageSize=10000`;
+    try {
+        const response = await apiRequest(url, { method: 'GET' });
+        const data = await response.json();
+        const provinces = data.items || [];
+
+        const provinceSelect = document.getElementById('province-select');
+        provinceSelect.innerHTML = '<option value="">Tất Cả Tỉnh - Thành</option>';
+
+        provinces.forEach(province => {
+            const option = document.createElement('option');
+            option.value = province.id;
+            option.textContent = province.name;
+            provinceSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error fetching provinces:', error);
+    }
+}
+
+async function loadSubdistricts(provinceId) {
+    const url = `${API_BASE_URL}Subdistricts?pageNumber=1&pageSize=10000&provinceId=${provinceId}`;
+    try {
+        const response = await apiRequest(url, { method: 'GET' });
+        const data = await response.json();
+        const subdistricts = data.items || [];
+
+        const subdistrictSelect = document.getElementById('subdistrict-select');
+        subdistrictSelect.innerHTML = '<option value="">-- Chọn quận/huyện --</option>';
+
+        if (subdistricts.length === 0) {
+            subdistrictSelect.disabled = true;
+            return;
+        }
+
+        subdistrictSelect.disabled = false;
+
+        subdistricts.forEach(subdistrict => {
+            const option = document.createElement('option');
+            option.value = subdistrict.id;
+            option.textContent = subdistrict.name;
+            subdistrictSelect.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error('Error fetching subdistricts:', error);
+    }
+}
+
+async function loadStores(subdistrictId) {
+    const url = `${API_BASE_URL}Stores?pageNumber=1&pageSize=10000&subdistrictId=${subdistrictId}`;
+    try {
+        const response = await apiRequest(url, { method: 'GET' });
+        const data = await response.json();
+        const stores = data.items || [];
+
+        const storeSelect = document.getElementById('store-select');
+        storeSelect.innerHTML = '<option value="">-- Chọn cửa hàng --</option>';
+
+        if (stores.length === 0) {
+            storeSelect.disabled = true;
+            return;
+        }
+
+        storeSelect.disabled = false;
+
+        stores.forEach(subdistrict => {
+            const option = document.createElement('option');
+            option.value = subdistrict.id;
+            option.textContent = subdistrict.name;
+            storeSelect.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error('Error fetching stores:', error);
+    }
+}
 
 async function searchOrders(pageNumber = 1, pageSize = 10) {
-    if (!currentStoreId) {
-        console.warn('Chưa có storeId, bỏ qua gọi API sản phẩm.');
-        return;
-    }
-
+    const provinceId = document.getElementById('province-select').value;
+    const subdistrictId = document.getElementById('subdistrict-select').value;
+    const storeId = document.getElementById('store-select').value;
     const orderCode = document.getElementById('orderCode').value.trim();
     const customerName = document.getElementById('customerName').value.trim();
     const customerPhone = document.getElementById('customerPhone').value.trim();
@@ -31,8 +135,11 @@ async function searchOrders(pageNumber = 1, pageSize = 10) {
     const fromDate = document.getElementById('fromDate').value;
     const toDate = document.getElementById('toDate').value;
 
-    let url = `${API_BASE_URL}Order/history/store?storeId=${currentStoreId}&PageNumber=${pageNumber}&PageSize=${pageSize}`;
+    let url = `${API_BASE_URL}Order/history/admin?PageNumber=${pageNumber}&PageSize=${pageSize}`;
 
+    if (provinceId) url += `&provinceId=${provinceId}`;
+    if (subdistrictId) url += `&subdistrictId=${subdistrictId}`;
+    if (storeId) url += `&storeId=${storeId}`;
     if (orderCode) url += `&OrderCode=${encodeURIComponent(orderCode)}`;
     if (customerName) url += `&CustomerName=${encodeURIComponent(customerName)}`;
     if (customerPhone) url += `&CustomerPhone=${encodeURIComponent(customerPhone)}`;
@@ -67,19 +174,19 @@ async function searchOrders(pageNumber = 1, pageSize = 10) {
 }
 
 const statusClassMap = {
-    Confirmed: 'btn-secondary',
-    Processing: 'btn-warning',
-    Completed: 'btn-success',
-    Cancelled: 'btn-danger'
+    0: 'btn-secondary',
+    1: 'btn-warning',
+    2: 'btn-success',
+    3: 'btn-danger'
 };
 
 const nbsp = '\u00A0';
 
 const statusVNMap = {
-    Confirmed: 'ĐÃ XÁC NHẬN',
-    Processing: 'ĐANG XỬ LÝ' + nbsp + nbsp + nbsp + nbsp,
-    Completed: 'HOÀN TẤT' + nbsp + nbsp + nbsp + nbsp + nbsp + nbsp + nbsp,
-    Cancelled: 'ĐÃ HỦY ĐƠN' + nbsp + nbsp
+    0: 'ĐÃ XÁC NHẬN',
+    1: 'ĐANG XỬ LÝ' + nbsp + nbsp + nbsp + nbsp,
+    2: 'HOÀN TẤT' + nbsp + nbsp + nbsp + nbsp + nbsp + nbsp + nbsp + nbsp,
+    3: 'ĐÃ HỦY ĐƠN' + nbsp + nbsp + nbsp
 };
 
 function updateTable(orders, pageNumber, totalPages) {
@@ -88,71 +195,34 @@ function updateTable(orders, pageNumber, totalPages) {
 
     if (Array.isArray(orders) && orders.length > 0) {
         orders.forEach(order => {
-            const btnGroupId = `statusDropdown-${order.orderCode}`;
-
-            const statusClass = statusClassMap[order.status] || 'btn-primary';
-            const statusText = statusVNMap[order.status] || 'Không rõ';
-
             const row = document.createElement('tr');
-
+            const statusClass = statusClassMap[order.status] || 'btn-primary';
+            const statusText = statusVNMap[order.status] || 'Chưa xác định';
             row.dataset.orderCode = order.orderCode;
             row.dataset.id = order.id;
 
-            let dropdownOptions = '';
-            let isDropdownDisabled = false;
-
-            if (order.status === 'Confirmed') {
-                dropdownOptions += `
-                <li><a class="dropdown-item" href="javascript:void(0);" data-status="Processing">Xử lý đơn hàng</a></li>
-                <li><a class="dropdown-item" href="javascript:void(0);" data-status="Completed">Hoàn thành</a></li>
-                <li><a class="dropdown-item" href="javascript:void(0);" data-status="Cancelled">Hủy đơn</a></li>
-            `;
-            } else if (order.status === 'Processing') {
-                dropdownOptions += `
-                <li><a class="dropdown-item" href="javascript:void(0);" data-status="Completed">Hoàn thành</a></li>
-                <li><a class="dropdown-item" href="javascript:void(0);" data-status="Cancelled">Hủy đơn</a></li>
-            `;
-            } else {
-                isDropdownDisabled = true;
-            }
-
             row.innerHTML = `
                 <td>${order.orderCode}</td>
+                <td>${order.storeName}</td>
                 <td>${order.customerName}</td>
                 <td>${order.customerPhone}</td>
-                <td>${formatDate(order.orderDate)}</td>
-                <td><strong>${order.isPaid === true ? 'Đã thanh toán' : 'Chưa thanh toán'}</strong></td>
-                <td>
-                    <div class="btn-group" id="${btnGroupId}">
-                        <button type="button" class="btn ${statusClass} btn-fixed-width">${statusText}</button>
-                        <button
-                            type="button"
-                            class="btn ${statusClass} dropdown-toggle dropdown-toggle-split"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                            ${isDropdownDisabled ? 'disabled' : ''}
-                        >
-                            <span class="visually-hidden">Toggle Dropdown</span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            ${dropdownOptions}
-                        </ul>
-                    </div>
+                <td>${order.orderDate ? formatDate(order.orderDate) : ''}</td>
+
+                <td class="">
+                    <button type="button" class="btn ${statusClass} btn-fixed-width">${statusText}</button>
                 </td>
             `;
 
             attachRowClickHandler(row);
             tableBody.appendChild(row);
-            updateBtnGroupClass(order.status, btnGroupId);
         });
 
         updatePaginationOrder(pageNumber, totalPages);
     } else {
         const noDataRow = document.createElement('tr');
-        noDataRow.innerHTML = `<td colspan="13" class="text-center">Không có dữ liệu</td>`;
+        noDataRow.innerHTML = `<td colspan="6" class="text-center">KHÔNG CÓ DỮ LIỆU</td>`;
         tableBody.appendChild(noDataRow);
     }
-
 }
 
 function attachRowClickHandler(row) {
@@ -167,7 +237,7 @@ function attachRowClickHandler(row) {
                 const orderData = await response.json();
                 fillOrderModal(orderData);
 
-                const modalElement = document.getElementById('orderDetailModal');
+                const modalElement = document.getElementById('orderDetailAdminModal');
                 if (modalElement) {
                     const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
                     modal.show();
@@ -184,126 +254,8 @@ function attachRowClickHandler(row) {
     btnGroups.forEach(el => {
         el.addEventListener('click', async function (e) {
             e.stopPropagation();
-
-            if (el.classList.contains('dropdown-item')) {
-                const newStatus = el.dataset.status;
-                const orderCode = row.dataset.orderCode;
-
-                try {
-                    const success = await updateOrderStatus(orderCode, newStatus);
-
-                    if (success) {
-                        const statusCell = row.querySelector('.status-cell');
-                        if (statusCell) statusCell.textContent = newStatus;
-
-                        showSuccessMessage(successMessagesDiv, `Cập nhật trạng thái đơn ${orderCode} thành công!`);
-                        window.scrollTo(0, 0);
-                        
-                    } else {
-                        showErrorMessage(errorMessagesDiv, 'Cập nhật trạng thái thất bại, vui lòng thử lại.');
-                        window.scrollTo(0, 0);
-                    }
-                } catch (err) {
-                    showErrorMessage(errorMessagesDiv, 'Lỗi khi cập nhật trạng thái: ' + err.message);
-                }
-            }
         });
     });
-}
-
-function setStatusMessage(type, message) {
-    localStorage.setItem('order-status-message', JSON.stringify({ type, message }));
-}
-
-function showStatusMessageIfAny() {
-    const messageData = JSON.parse(localStorage.getItem('order-status-message'));
-    if (!messageData) return;
-
-    const successBox = document.getElementById('error-success');
-    const errorBox = document.getElementById('error-messages');
-
-    if (messageData.type === 'success') {
-        showSuccessMessage(successBox, messageData.message);
-    } else {
-        showErrorMessage(errorBox, messageData.message);
-    }
-
-    localStorage.removeItem('order-status-message');
-}
-
-
-function showErrorMessage(errorDiv, message) {
-    errorDiv.innerHTML = '';
-    errorDiv.textContent = message;
-
-    const closeButton = document.createElement('button');
-    closeButton.type = 'button';
-    closeButton.classList.add('btn-close');
-    closeButton.setAttribute('aria-label', 'Close');
-    closeButton.addEventListener('click', function () {
-        errorDiv.classList.add('d-none');
-    });
-
-    errorDiv.appendChild(closeButton);
-    errorDiv.classList.remove('d-none');
-}
-
-function showSuccessMessage(successDiv, message) {
-    successDiv.innerHTML = '';
-    successDiv.textContent = message;
-
-    const closeButton = document.createElement('button');
-    closeButton.type = 'button';
-    closeButton.classList.add('btn-close');
-    closeButton.setAttribute('aria-label', 'Close');
-    closeButton.addEventListener('click', function () {
-        successDiv.classList.add('d-none');
-    });
-
-    successDiv.appendChild(closeButton);
-    successDiv.classList.remove('d-none');
-}
-
-
-const orderStatusEnum = {
-    Confirmed: 0,
-    Processing: 1,
-    Completed: 2,
-    Cancelled: 3
-};
-
-async function updateOrderStatus(orderCode, newStatusString) {
-    const newStatus = orderStatusEnum[newStatusString];
-
-    errorMessagesDiv.classList.add('d-none');
-    successMessagesDiv.classList.add('d-none');
-    errorMessagesDiv.textContent = '';
-    successMessagesDiv.textContent = '';
-
-    if (newStatus === undefined) {
-        console.error('Trạng thái không hợp lệ:', newStatusString);
-        return false;
-    }
-
-    const url = `${API_BASE_URL}Order/update-status/${orderCode}`;
-
-    try {
-        const response = await apiRequest(url, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(newStatus)
-        });
-
-        if (!response.ok) {
-            throw new Error(`Lỗi HTTP: ${response.status}`);
-        }
-        return true;
-    } catch (error) {
-        console.error('Lỗi khi gọi API cập nhật trạng thái:', error);
-        return false;
-    }
 }
 
 const statusVNMapModal = {
@@ -315,6 +267,9 @@ const statusVNMapModal = {
 
 function fillOrderModal(data) {
     document.getElementById('orderCodeModal').textContent = data.orderCode || '—';
+    document.getElementById('provinceNameModal').textContent = data.provinceName || '—';
+    document.getElementById('subdistrictNameModal').textContent = data.subdistrictName || '—';
+    document.getElementById('storeNameModal').textContent = data.storeName || '—';
     document.getElementById('verificationCodeModal').textContent = data.verificationCode || '—';
     document.getElementById('orderDateModal').textContent = new Date(data.orderDate).toLocaleString('vi-VN') || '—';
     document.getElementById('customerNameModal').textContent = data.customerName || '—';
@@ -322,17 +277,18 @@ function fillOrderModal(data) {
     document.getElementById('customerEmailModal').textContent = data.customerEmail || '—';
     document.getElementById('noteModal').textContent = data.note || '—';
     document.getElementById('isPaidModal').textContent = data.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán';
-    document.getElementById('paymentDateModal').textContent = new Date(data.paidAt).toLocaleString('vi-VN') || '—';
+    document.getElementById('paidDateModal').textContent = new Date(data.paidAt).toLocaleString('vi-VN') || '—';
 
     const statusEl = document.getElementById('statusModal');
-    const status = data.status || '—';
+    const status = data.status;
 
-    statusEl.textContent = statusVNMapModal[status] || status;
-
+    statusEl.textContent = statusVNMapModal[status] || '—';
     statusEl.className = '';
 
     if (status === 'Completed') {
         statusEl.classList.add('text-success', 'fw-bold');
+    } else if (status === 'Processing') {
+        statusEl.classList.add('text-warning', 'fw-bold');
     } else if (status === 'Cancelled') {
         statusEl.classList.add('text-danger', 'fw-bold');
     } else if (status === 'Confirmed') {
@@ -439,45 +395,12 @@ function updatePaginationOrder(currentPage, totalPages) {
     }
 }
 
-async function getProfileData() {
-    const url = `${API_BASE_URL}Auth/Profile`;
-    try {
-        const response = await apiRequest(url, { method: 'GET' });
-
-        if (response.ok) {
-            const data = await response.json();
-            currentStoreId = data.storeId;
-
-            const storeIdInput = document.getElementById('storeId');
-            if (storeIdInput) {
-                storeIdInput.value = data.storeId ?? '';
-            }
-
-            const storeNameInput = document.getElementById('storeName');
-            if (storeNameInput && storeNameInput.tagName === 'INPUT') {
-                storeNameInput.value = data.storeName ?? '';
-            }
-
-            const storeNameHeader = document.getElementById('storeName');
-            if (storeNameHeader && storeNameHeader.tagName === 'H5') {
-                storeNameHeader.textContent = data.storeName ?? 'Tên cửa hàng không xác định';
-            }
-
-            return data;
-        } else {
-            throw new Error('Không thể lấy dữ liệu profile');
-        }
-    } catch (error) {
-        console.error('Lỗi khi gọi API:', error);
-    }
-}
-
 function updateBtnGroupClass(status, btnGroupId) {
     const statusClassMap = {
-        Confirmed: 'btn-secondary',
-        Processing: 'btn-warning',
-        Completed: 'btn-success',
-        Cancelled: 'btn-danger'
+        0: 'btn-secondary',
+        1: 'btn-warning',
+        2: 'btn-success',
+        3: 'btn-danger'
     };
 
     const btnGroup = document.getElementById(btnGroupId);

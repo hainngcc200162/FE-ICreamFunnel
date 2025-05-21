@@ -145,12 +145,31 @@
 
                     <div class="container-xxl flex-grow-1 container-p-y">
                         <h4 class="fw-bold py-3 mb-4">
-                            <span class="text-muted fw-light">Đơn hàng/</span> Điều phối đơn hàng.
+                            <span class="text-muted fw-light">Đơn hàng/</span>Quản lý đơn hàng.
                         </h4>
 
                         <!-- Search Form -->
                         <form method="get" class="d-flex flex-wrap justify-content-start align-items-center">
+
                             <div class="row w-100">
+                                <div class="col-md-4 mb-3">
+                                    <label for="province-select" class="form-label">Tỉnh - Thành Phố</label>
+                                    <select class="form-select" id="province-select">
+                                        <option value="">Tất cả Tỉnh - Thành</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="subdistrict-select" class="form-label">Quận - Huyện</label>
+                                    <select class="form-select" id="subdistrict-select">
+                                        <option value="">Tất cả Quận - Huyện</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="store-select" class="form-label">Cửa hàng</label>
+                                    <select class="form-select" id="store-select">
+                                        <option value="">Tất cả Cửa Hàng</option>
+                                    </select>
+                                </div>
                                 <!-- OrderCode -->
                                 <div class="col-md-4 mb-3">
                                     <div class="form-group">
@@ -182,7 +201,6 @@
                                         <select class="form-select" id="status" name="Status">
                                             <option value="">Tất cả trạng thái</option>
                                             <option value="Confirmed">Đã xác nhận</option>
-                                            <option value="Processing">Đang xử lý</option>
                                             <option value="Completed">Hoàn tất</option>
                                             <option value="Cancelled">Đã hủy đơn</option>
                                         </select>
@@ -202,7 +220,7 @@
 
                                 <div class="col-md-3 mb-3">
                                     <div class="form-group">
-                                        <label for="fromDate" class="form-label">Từ ngày</label>
+                                        <label for="fromDate" class="form-label">Ngày đặt hàng(Từ ngày)</label>
                                         <input type="date" class="form-control" id="fromDate" name="FromDate"
                                             placeholder="Từ ngày">
                                     </div>
@@ -210,7 +228,7 @@
 
                                 <div class="col-md-3 mb-3">
                                     <div class="form-group">
-                                        <label for="toDate" class="form-label">Đến ngày</label>
+                                        <label for="toDate" class="form-label">Ngày đặt hàng(Đến ngày)</label>
                                         <input type="date" class="form-control" id="toDate" name="ToDate"
                                             placeholder="Đến ngày">
                                     </div>
@@ -238,15 +256,17 @@
                                     <thead>
                                         <tr>
                                             <th>Mã đơn hàng</th>
+                                            <Th>Tên cửa hàng</Th>
                                             <th>Tên khách hàng</th>
                                             <th>Số điện thoại</th>
                                             <th>Ngày đặt hàng</th>
-                                            <th>TT thanh toán</th>
                                             <th>Trạng thái đơn hàng</th>
                                         </tr>
                                     </thead>
                                     <tbody class="table-border-bottom-0">
                                         <tr>
+                                            <td> </td>
+                                            <td> </td>
                                             <td> </td>
                                             <td> </td>
                                             <td> </td>
@@ -341,24 +361,30 @@
     <script src="../../env/config.develop.js"></script>
     <script src="../../TokenValid.js"></script>
     <script src="../js/loadSidebar.js"></script>
-    <script src="../js/manage-order-storeOwner.js"></script>
+    <script src="../js/manage-order-admin.js"></script>
 
     <!-- Modal content -->
-    <div id="orderDetailModal" class="modal fade" tabindex="-1" aria-labelledby="orderDetailModalLabel"
+    <div id="orderDetailAdminModal" class="modal fade" tabindex="-1" aria-labelledby="orderDetailAdminModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-xxl modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="orderDetailModalLabel">Chi tiết đơn hàng</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                <div class="modal-header d-flex align-items-center w-100">
+                    <h3 class="modal-title mb-0">Chi tiết đơn hàng</h3>
+
+                    <h5 id="storeNameModal" class="mb-0 fw-bold ms-auto"></h5>
+
+                    <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Đóng"></button>
                 </div>
+
+
                 <div class="modal-body">
                     <div id="order-info-section" class="">
                         <div class="row">
                             <div class="col-md-4">
                                 <p><strong>Mã đơn hàng:</strong> <span id="orderCodeModal"></span></p>
                                 <p><strong>Mã xác nhận:</strong> <span id="verificationCodeModal"></span></p>
-
+                                <p><strong>Tỉnh - Thành:</strong> <span id="provinceNameModal"></span></p>
+                                <p><strong>Quận - Huyện:</strong> <span id="subdistrictNameModal"></span></p>
                             </div>
                             <div class="col-md-4">
                                 <p><strong>Khách hàng:</strong> <span id="customerNameModal"></span></p>
@@ -368,8 +394,8 @@
                             </div>
                             <div class="col-md-4">
                                 <p><strong>Ngày đặt hàng:</strong> <span id="orderDateModal"></span></p>
-                                <p><strong>Ngày thanh toán:</strong> <span id="paymentDateModal"></span></p>
-                                <p><strong>TT Thanh toán:</strong> <span id="isPaidModal"></span></p>
+                                <p><strong>Ngày thanh toán:</strong> <span id="paidDateModal"></span></p>
+                                <p><strong>Đã thanh toán:</strong> <span id="isPaidModal"></span></p>
                                 <p><strong>Trạng thái:</strong> <span id="statusModal"></span></p>
                             </div>
                         </div>
@@ -377,7 +403,7 @@
                     <hr class="my-3" />
                     <!-- Danh sách sản phẩm -->
                     <div id="order-details-sectionModal">
-                        <h6 class="mb-3">Chi tiết sản phẩm</h6>
+                        <h4 class="mb-3">Chi tiết sản phẩm</h4>
                         <div class="table-responsive">
                             <table class="table table-bordered align-middle">
                                 <thead class="table-light">

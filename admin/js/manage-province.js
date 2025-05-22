@@ -108,9 +108,9 @@ function updateTable(provinces, pageNumber, totalPages) {
             const row = document.createElement('tr');
 
             row.innerHTML = `
+                <td></td>
                 <td><strong>${province.id}</strong></td>
                 <td>${province.name}</td>
-                <td></td>
                 <td></td>
                 <td>
                     <a href="#" class="btn btn-icon text province-update-btn" data-province-id="${province.id}" title="Edit">
@@ -140,7 +140,7 @@ function attachUpdateEventListeners() {
     const updateButtons = document.querySelectorAll(".province-update-btn");
     updateButtons.forEach(button => {
         button.addEventListener("click", async function (e) {
-            e.preventDefault();  
+            e.preventDefault();
             const provinceId = this.getAttribute('data-province-id');
             await updateProvinceDetail(provinceId);
         });
@@ -151,7 +151,7 @@ function attachDeleteEventListeners() {
     const deleteButtons = document.querySelectorAll(".province-delete-btn");
     deleteButtons.forEach(button => {
         button.addEventListener("click", async function (e) {
-            e.preventDefault();  
+            e.preventDefault();
             const provinceId = this.getAttribute('data-province-id');
             await deleteProvince(provinceId);
         });
@@ -205,7 +205,7 @@ async function deleteProvince(provinceId) {
             const deleteUrl = `${API_BASE_URL}Provinces/${provinceId}`;
             const deleteResponse = await apiRequest(deleteUrl, {
                 method: 'DELETE',
-                headers: { 'Accept': '*/*' }  
+                headers: { 'Accept': '*/*' }
             });
 
             if (deleteResponse.ok) {
@@ -227,7 +227,6 @@ async function deleteProvince(provinceId) {
     });
 }
 
-
 function updatePaginationProvince(currentPage, totalPages) {
     const paginationContainer = document.querySelector('#province-pagination .pagination');
 
@@ -241,52 +240,71 @@ function updatePaginationProvince(currentPage, totalPages) {
     nextPageButton.classList.toggle('disabled', currentPage === totalPages);
     lastPageButton.classList.toggle('disabled', currentPage === totalPages);
 
-    const pageItems = paginationContainer.querySelectorAll('.page-item.page-number');
+    const pageItems = paginationContainer.querySelectorAll('.page-item.page-number, .page-item.ellipsis');
     pageItems.forEach(item => item.remove());
 
-    firstPageButton.querySelector('a').addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage = 1;
-            searchProvinces(currentPage, pageSizeIndex);
-        }
-    });
+    firstPageButton.querySelector('a').onclick = () => {
+        if (currentPage > 1) searchProvinces(1, pageSizeIndex);
+    };
+    prevPageButton.querySelector('a').onclick = () => {
+        if (currentPage > 1) searchProvinces(currentPage - 1, pageSizeIndex);
+    };
+    nextPageButton.querySelector('a').onclick = () => {
+        if (currentPage < totalPages) searchProvinces(currentPage + 1, pageSizeIndex);
+    };
+    lastPageButton.querySelector('a').onclick = () => {
+        if (currentPage < totalPages) searchProvinces(totalPages, pageSizeIndex);
+    };
 
-    prevPageButton.querySelector('a').addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            searchProvinces(currentPage, pageSizeIndex);
-        }
-    });
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = startPage + maxPagesToShow - 1;
 
-    nextPageButton.querySelector('a').addEventListener('click', () => {
-        if (currentPage < totalPages) {
-            currentPage++;
-            searchProvinces(currentPage, pageSizeIndex);
-        }
-    });
+    if (endPage > totalPages) {
+        endPage = totalPages;
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
 
-    lastPageButton.querySelector('a').addEventListener('click', () => {
-        if (currentPage < totalPages) {
-            currentPage = totalPages;
-            searchProvinces(currentPage, pageSizeIndex);
-        }
-    });
+    if (startPage > 1) {
+        addPageNumber(1);
+        if (startPage > 2) addEllipsis();
+    }
 
-    for (let i = 1; i <= totalPages; i++) {
+    for (let i = startPage; i <= endPage; i++) {
+        addPageNumber(i);
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) addEllipsis();
+        addPageNumber(totalPages);
+    }
+
+    function addPageNumber(page) {
         const pageItem = document.createElement('li');
-        pageItem.className = `page-item page-number${i === currentPage ? ' active' : ''}`;
+        pageItem.className = `page-item page-number${page === currentPage ? ' active' : ''}`;
 
         const pageLink = document.createElement('a');
         pageLink.className = 'page-link';
         pageLink.href = 'javascript:void(0);';
-        pageLink.innerText = i;
+        pageLink.innerText = page;
         pageLink.addEventListener('click', () => {
-            currentPage = i;
-            searchProvinces(currentPage, pageSizeIndex);
+            searchProvinces(page, pageSizeIndex);
         });
 
         pageItem.appendChild(pageLink);
         paginationContainer.insertBefore(pageItem, nextPageButton);
+    }
+
+    function addEllipsis() {
+        const ellipsisItem = document.createElement('li');
+        ellipsisItem.className = 'page-item ellipsis disabled';
+
+        const ellipsisLink = document.createElement('span');
+        ellipsisLink.className = 'page-link';
+        ellipsisLink.innerText = '...';
+
+        ellipsisItem.appendChild(ellipsisLink);
+        paginationContainer.insertBefore(ellipsisItem, nextPageButton);
     }
 }
 

@@ -198,6 +198,68 @@ function updateTable(stocks, pageNumber, totalPages) {
     }
 }
 
+// function updatePaginationStock(currentPage, totalPages) {
+//     const paginationContainer = document.querySelector('#stock-pagination .pagination');
+
+//     const firstPageButton = paginationContainer.querySelector('.first');
+//     const prevPageButton = paginationContainer.querySelector('.prev');
+//     const nextPageButton = paginationContainer.querySelector('.next');
+//     const lastPageButton = paginationContainer.querySelector('.last');
+
+//     firstPageButton.classList.toggle('disabled', currentPage === 1);
+//     prevPageButton.classList.toggle('disabled', currentPage === 1);
+//     nextPageButton.classList.toggle('disabled', currentPage === totalPages);
+//     lastPageButton.classList.toggle('disabled', currentPage === totalPages);
+
+//     const pageItems = paginationContainer.querySelectorAll('.page-item.page-number');
+//     pageItems.forEach(item => item.remove());
+
+//     firstPageButton.querySelector('a').addEventListener('click', () => {
+//         if (currentPage > 1) {
+//             currentPage = 1;
+//             searchStocks(currentPage, pageSizeIndex);
+//         }
+//     });
+
+//     prevPageButton.querySelector('a').addEventListener('click', () => {
+//         if (currentPage > 1) {
+//             currentPage--;
+//             searchStocks(currentPage, pageSizeIndex);
+//         }
+//     });
+
+//     nextPageButton.querySelector('a').addEventListener('click', () => {
+//         if (currentPage < totalPages) {
+//             currentPage++;
+//             searchStocks(currentPage, pageSizeIndex);
+//         }
+//     });
+
+//     lastPageButton.querySelector('a').addEventListener('click', () => {
+//         if (currentPage < totalPages) {
+//             currentPage = totalPages;
+//             searchStocks(currentPage, pageSizeIndex);
+//         }
+//     });
+
+//     for (let i = 1; i <= totalPages; i++) {
+//         const pageItem = document.createElement('li');
+//         pageItem.className = `page-item page-number${i === currentPage ? ' active' : ''}`;
+
+//         const pageLink = document.createElement('a');
+//         pageLink.className = 'page-link';
+//         pageLink.href = 'javascript:void(0);';
+//         pageLink.innerText = i;
+//         pageLink.addEventListener('click', () => {
+//             currentPage = i;
+//             searchStocks(currentPage, pageSizeIndex);
+//         });
+
+//         pageItem.appendChild(pageLink);
+//         paginationContainer.insertBefore(pageItem, nextPageButton);
+//     }
+// }
+
 function updatePaginationStock(currentPage, totalPages) {
     const paginationContainer = document.querySelector('#stock-pagination .pagination');
 
@@ -211,52 +273,71 @@ function updatePaginationStock(currentPage, totalPages) {
     nextPageButton.classList.toggle('disabled', currentPage === totalPages);
     lastPageButton.classList.toggle('disabled', currentPage === totalPages);
 
-    const pageItems = paginationContainer.querySelectorAll('.page-item.page-number');
+    const pageItems = paginationContainer.querySelectorAll('.page-item.page-number, .page-item.ellipsis');
     pageItems.forEach(item => item.remove());
 
-    firstPageButton.querySelector('a').addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage = 1;
-            searchStocks(currentPage, pageSizeIndex);
-        }
-    });
+    firstPageButton.querySelector('a').onclick = () => {
+        if (currentPage > 1) searchStocks(1, pageSizeIndex);
+    };
+    prevPageButton.querySelector('a').onclick = () => {
+        if (currentPage > 1) searchStocks(currentPage - 1, pageSizeIndex);
+    };
+    nextPageButton.querySelector('a').onclick = () => {
+        if (currentPage < totalPages) searchStocks(currentPage + 1, pageSizeIndex);
+    };
+    lastPageButton.querySelector('a').onclick = () => {
+        if (currentPage < totalPages) searchStocks(totalPages, pageSizeIndex);
+    };
 
-    prevPageButton.querySelector('a').addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            searchStocks(currentPage, pageSizeIndex);
-        }
-    });
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = startPage + maxPagesToShow - 1;
 
-    nextPageButton.querySelector('a').addEventListener('click', () => {
-        if (currentPage < totalPages) {
-            currentPage++;
-            searchStocks(currentPage, pageSizeIndex);
-        }
-    });
+    if (endPage > totalPages) {
+        endPage = totalPages;
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
 
-    lastPageButton.querySelector('a').addEventListener('click', () => {
-        if (currentPage < totalPages) {
-            currentPage = totalPages;
-            searchStocks(currentPage, pageSizeIndex);
-        }
-    });
+    if (startPage > 1) {
+        addPageNumber(1);
+        if (startPage > 2) addEllipsis();
+    }
 
-    for (let i = 1; i <= totalPages; i++) {
+    for (let i = startPage; i <= endPage; i++) {
+        addPageNumber(i);
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) addEllipsis();
+        addPageNumber(totalPages);
+    }
+
+    function addPageNumber(page) {
         const pageItem = document.createElement('li');
-        pageItem.className = `page-item page-number${i === currentPage ? ' active' : ''}`;
+        pageItem.className = `page-item page-number${page === currentPage ? ' active' : ''}`;
 
         const pageLink = document.createElement('a');
         pageLink.className = 'page-link';
         pageLink.href = 'javascript:void(0);';
-        pageLink.innerText = i;
+        pageLink.innerText = page;
         pageLink.addEventListener('click', () => {
-            currentPage = i;
-            searchStocks(currentPage, pageSizeIndex);
+            searchStocks(page, pageSizeIndex);
         });
 
         pageItem.appendChild(pageLink);
         paginationContainer.insertBefore(pageItem, nextPageButton);
+    }
+
+    function addEllipsis() {
+        const ellipsisItem = document.createElement('li');
+        ellipsisItem.className = 'page-item ellipsis disabled';
+
+        const ellipsisLink = document.createElement('span');
+        ellipsisLink.className = 'page-link';
+        ellipsisLink.innerText = '...';
+
+        ellipsisItem.appendChild(ellipsisLink);
+        paginationContainer.insertBefore(ellipsisItem, nextPageButton);
     }
 }
 

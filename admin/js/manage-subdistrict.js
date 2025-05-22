@@ -112,6 +112,67 @@ function addPaginationClickEvents() {
     });
 }
 
+// function updatePagination(currentPage, totalPages) {
+//     const paginationContainer = document.querySelector('#subdistrict-pagination .pagination');
+
+//     const firstPageButton = paginationContainer.querySelector('.first');
+//     const prevPageButton = paginationContainer.querySelector('.prev');
+//     const nextPageButton = paginationContainer.querySelector('.next');
+//     const lastPageButton = paginationContainer.querySelector('.last');
+
+//     firstPageButton.classList.toggle('disabled', currentPage === 1);
+//     firstPageButton.querySelector('a').addEventListener('click', () => {
+//         if (currentPage > 1) {
+//             currentPage = 1;
+//             searchSubdistrict(currentPage, pageSize);
+//         }
+//     });
+
+//     prevPageButton.classList.toggle('disabled', currentPage === 1);
+//     prevPageButton.querySelector('a').addEventListener('click', () => {
+//         if (currentPage > 1) {
+//             currentPage--;
+//             searchSubdistrict(currentPage, pageSize);
+//         }
+//     });
+
+//     nextPageButton.classList.toggle('disabled', currentPage === totalPages);
+//     nextPageButton.querySelector('a').addEventListener('click', () => {
+//         if (currentPage < totalPages) {
+//             currentPage++;
+//             searchSubdistrict(currentPage, pageSize);
+//         }
+//     });
+
+//     lastPageButton.classList.toggle('disabled', currentPage === totalPages);
+//     lastPageButton.querySelector('a').addEventListener('click', () => {
+//         if (currentPage < totalPages) {
+//             currentPage = totalPages;
+//             searchSubdistrict(currentPage, pageSize);
+//         }
+//     });
+
+//     const pageItems = paginationContainer.querySelectorAll('.page-item.page-number');
+//     pageItems.forEach(item => item.remove()); 
+
+//     for (let i = 1; i <= totalPages; i++) {
+//         const pageItem = document.createElement('li');
+//         pageItem.className = `page-item page-number${i === currentPage ? ' active' : ''}`;
+
+//         const pageLink = document.createElement('a');
+//         pageLink.className = 'page-link';
+//         pageLink.href = 'javascript:void(0);';
+//         pageLink.innerText = i;
+//         pageLink.addEventListener('click', () => {
+//             currentPage = i;
+//             searchSubdistrict(currentPage, pageSize);
+//         });
+
+//         pageItem.appendChild(pageLink);
+//         paginationContainer.insertBefore(pageItem, nextPageButton); 
+//     }
+// }
+
 function updatePagination(currentPage, totalPages) {
     const paginationContainer = document.querySelector('#subdistrict-pagination .pagination');
 
@@ -121,55 +182,75 @@ function updatePagination(currentPage, totalPages) {
     const lastPageButton = paginationContainer.querySelector('.last');
 
     firstPageButton.classList.toggle('disabled', currentPage === 1);
-    firstPageButton.querySelector('a').addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage = 1;
-            searchSubdistrict(currentPage, pageSize);
-        }
-    });
-
     prevPageButton.classList.toggle('disabled', currentPage === 1);
-    prevPageButton.querySelector('a').addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            searchSubdistrict(currentPage, pageSize);
-        }
-    });
-
     nextPageButton.classList.toggle('disabled', currentPage === totalPages);
-    nextPageButton.querySelector('a').addEventListener('click', () => {
-        if (currentPage < totalPages) {
-            currentPage++;
-            searchSubdistrict(currentPage, pageSize);
-        }
-    });
-
     lastPageButton.classList.toggle('disabled', currentPage === totalPages);
-    lastPageButton.querySelector('a').addEventListener('click', () => {
-        if (currentPage < totalPages) {
-            currentPage = totalPages;
-            searchSubdistrict(currentPage, pageSize);
-        }
-    });
 
-    const pageItems = paginationContainer.querySelectorAll('.page-item.page-number');
-    pageItems.forEach(item => item.remove()); 
+    const pageItems = paginationContainer.querySelectorAll('.page-item.page-number, .page-item.ellipsis');
+    pageItems.forEach(item => item.remove());
 
-    for (let i = 1; i <= totalPages; i++) {
+    firstPageButton.querySelector('a').onclick = () => {
+        if (currentPage > 1) searchSubdistrict(1, pageSize);
+    };
+    prevPageButton.querySelector('a').onclick = () => {
+        if (currentPage > 1) searchSubdistrict(currentPage - 1, pageSize);
+    };
+    nextPageButton.querySelector('a').onclick = () => {
+        if (currentPage < totalPages) searchSubdistrict(currentPage + 1, pageSize);
+    };
+    lastPageButton.querySelector('a').onclick = () => {
+        if (currentPage < totalPages) searchSubdistrict(totalPages, pageSize);
+    };
+
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = startPage + maxPagesToShow - 1;
+
+    if (endPage > totalPages) {
+        endPage = totalPages;
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    if (startPage > 1) {
+        addPageNumber(1);
+        if (startPage > 2) addEllipsis();
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        addPageNumber(i);
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) addEllipsis();
+        addPageNumber(totalPages);
+    }
+
+    function addPageNumber(page) {
         const pageItem = document.createElement('li');
-        pageItem.className = `page-item page-number${i === currentPage ? ' active' : ''}`;
+        pageItem.className = `page-item page-number${page === currentPage ? ' active' : ''}`;
 
         const pageLink = document.createElement('a');
         pageLink.className = 'page-link';
         pageLink.href = 'javascript:void(0);';
-        pageLink.innerText = i;
+        pageLink.innerText = page;
         pageLink.addEventListener('click', () => {
-            currentPage = i;
-            searchSubdistrict(currentPage, pageSize);
+            searchSubdistrict(page, pageSize);
         });
 
         pageItem.appendChild(pageLink);
-        paginationContainer.insertBefore(pageItem, nextPageButton); 
+        paginationContainer.insertBefore(pageItem, nextPageButton);
+    }
+
+    function addEllipsis() {
+        const ellipsisItem = document.createElement('li');
+        ellipsisItem.className = 'page-item ellipsis disabled';
+
+        const ellipsisLink = document.createElement('span');
+        ellipsisLink.className = 'page-link';
+        ellipsisLink.innerText = '...';
+
+        ellipsisItem.appendChild(ellipsisLink);
+        paginationContainer.insertBefore(ellipsisItem, nextPageButton);
     }
 }
 
